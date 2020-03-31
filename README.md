@@ -1,1 +1,1 @@
-# cse237-project
+# Personal-Planner-Plus
