@@ -11,7 +11,7 @@ To Run:
 - Open command line, and navigate to the repository
 - Run the following commands:
     - javac *.java
-    - java Planner
+    - java PlannerGUI
 - Note: On Mac, you may receive the [following error message](./Resources/Error_Message.png)
 
 ## Resources
