@@ -28,7 +28,7 @@ public class PlannerGUI extends Application
 
         ListView eventsList = new ListView();
         for (int i=0; i< 50; ++i){
-            eventsList.getItems().add(monthToString(newEvent.getStartDate().getMonth()) + " " + newEvent.getStartDate().getDay() +"\t" +newEvent.getName());
+            eventsList.getItems().add(monthToString(newEvent.getStartDate().getMonth()) + " " + newEvent.getStartDate().getDate() +"\t" +newEvent.getName());
         }
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(eventsList);
