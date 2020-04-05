@@ -12,6 +12,9 @@ import java.util.ArrayList;
 
 public class PlannerGUI extends Application
 {
+
+    Event newEvent;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -20,25 +23,33 @@ public class PlannerGUI extends Application
     @Override
     public void start(Stage primaryStage) throws Exception 
     {
-
+        //dummy data.  delete on backend integration
         ArrayList<String> tags = new ArrayList<String>();
-        Event newEvent = new Event("Test", new Date(), new Date(), tags, 0);
+        newEvent = new Event("Test", new Date(), new Date(), tags, 0);
 
         primaryStage.setTitle("Personal Planner +");
 
+        ListView eventsList = createListView();
+        ScrollPane scrollPane = createScrollPaneWithEvents(eventsList);
+        
+        
+        showRootElement(primaryStage, scrollPane);
+    }
+
+    private ListView createListView(){
         ListView eventsList = new ListView();
         for (int i=0; i< 50; ++i){
             eventsList.getItems().add(monthToString(newEvent.getStartDate().getMonth()) + " " + newEvent.getStartDate().getDate() +"\t" +newEvent.getName());
         }
+        return eventsList;
+    }
+
+    private ScrollPane createScrollPaneWithEvents(ListView eventsList){
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(eventsList);
         scrollPane.fitToWidthProperty().set(true);
         scrollPane.pannableProperty().set(true);
-        
-        StackPane root = new StackPane();
-        root.getChildren().add(scrollPane);
-        primaryStage.setScene(new Scene(root, 600, 700));
-        primaryStage.show();
+        return scrollPane;
     }
 
     private String monthToString(int month){
@@ -68,5 +79,12 @@ public class PlannerGUI extends Application
             default:
                 return "December";
         }
+    }
+
+    private void showRootElement(Stage primaryStage, ScrollPane child){
+        StackPane root = new StackPane();
+        root.getChildren().add(child);
+        primaryStage.setScene(new Scene(root, 600, 700));
+        primaryStage.show();
     }
 }
