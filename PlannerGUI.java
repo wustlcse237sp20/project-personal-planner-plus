@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class PlannerGUI extends Application
 {
 
-    Event newEvent;
+    ArrayList<Event> events;
 
     public static void main(String[] args) {
         launch(args);
@@ -24,8 +24,10 @@ public class PlannerGUI extends Application
     public void start(Stage primaryStage) throws Exception 
     {
         //dummy data.  delete on backend integration
-        ArrayList<String> tags = new ArrayList<String>();
-        newEvent = new Event("Test", new Date(), new Date(), tags, 0);
+        for(int i = 0; i < 50; i++){
+            Event newEvent = new Event("Test", new Date(), new Date(), new ArrayList<String>(), 0);
+            events.add(newEvent);
+        }
 
         primaryStage.setTitle("Personal Planner +");
 
@@ -38,8 +40,8 @@ public class PlannerGUI extends Application
 
     private ListView createListView(){
         ListView eventsList = new ListView();
-        for (int i=0; i< 50; ++i){
-            eventsList.getItems().add(monthToString(newEvent.getStartDate().getMonth()) + " " + newEvent.getStartDate().getDate() +"\t" +newEvent.getName());
+        for (Event event:events){
+            eventsList.getItems().add(monthToString(event.getStartDate().getMonth()) + " " + event.getStartDate().getDate() +"\t" +event.getName());
         }
         return eventsList;
     }
