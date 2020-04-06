@@ -26,7 +26,7 @@ To Run:
 - View event details
 - Edit events
 - Delete events
-
+- Persist data
 ## Is there anything that you implemented but doesn't currently work?
 
 N/A
