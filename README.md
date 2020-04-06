@@ -18,12 +18,14 @@ To Run:
     - Note: On Mac, you may receive [an error message](./Resources/Error_Message.png), which can be disregarded
 
 ## What user stories were completed this iteration?
-- Create UI
-- Ability to view events
+- Create the UI
+- View events
 
 ## What user stories do you intend to complete next iteration?
-- Viewing event details upon clicking
-- Ability to add and remove events within UI
+- Create events
+- View event details
+- Edit events
+- Delete events
 
 ## Is there anything that you implemented but doesn't currently work?
 
