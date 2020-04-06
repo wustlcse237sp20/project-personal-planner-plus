@@ -33,5 +33,5 @@ N/A
 
 ## Resources
 
-[JavaFX](https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/)
+[JavaFX](https://docs.oracle.com/javafx/2/get_started/jfxpub-get_started.htm)
 
