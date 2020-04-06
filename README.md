@@ -10,6 +10,7 @@ To Run:
 - Clone or download this Git repository to your local machine
     - ```git clone https://github.com/wustlcse237sp20/project-personal-planner-plus.git```
 - Open command line, and navigate to the repository
+    - ```cd project-personal-planner-plus```
 - Run the following commands:
     - ```mkdir bin```
     - ```javac -d bin -cp src src/*.java```
