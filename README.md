@@ -11,24 +11,22 @@ To Run:
     - ```git clone https://github.com/wustlcse237sp20/project-personal-planner-plus.git```
 - Open command line, and navigate to the repository
 - Run the following commands:
-    - ```javac *.java```
-    - ```java PlannerGUI```
+    - ```mkdir bin```
+    - ```javac -d bin -cp src src/*.java```
+    - ```java -cp bin src.PlannerGUI```
     - Note: On Mac, you may receive [an error message](./Resources/Error_Message.png), which can be disregarded
 
 ## What user stories were completed this iteration?
-
-- The ability to view events
-- The ability to scroll through all events
-- Load saved data (currently 'dummy data')
+- Create UI
+- Ability to view events
 
 ## What user stories do you intend to complete next iteration?
-
-- The ability to delete events
-- The ability to interact with the modal for creating events
+- Viewing event details upon clicking
+- Ability to add and remove events within UI
 
 ## Is there anything that you implemented but doesn't currently work?
 
-In future versions, clicking on the events will display further information. Regardless, everything else is implemented as appropriate. 
+N/A
 
 ## Resources
 
