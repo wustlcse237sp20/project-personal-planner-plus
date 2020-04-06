@@ -33,7 +33,5 @@ N/A
 
 ## Resources
 
-[Persistent Local storage](https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/)
-
 [JavaFX](https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/)
 
