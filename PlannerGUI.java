@@ -88,6 +88,7 @@ public class PlannerGUI extends Application
         StackPane root = new StackPane();
         root.getChildren().add(child);
         primaryStage.setScene(new Scene(root, 600, 700));
+        primaryStage.setMaximized(true);
         primaryStage.show();
     }
 }
