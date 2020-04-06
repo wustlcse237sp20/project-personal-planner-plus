@@ -23,6 +23,7 @@ public class PlannerGUI extends Application
     @Override
     public void start(Stage primaryStage) throws Exception 
     {
+        events = new ArrayList<Event>();
         //dummy data.  delete on backend integration
         for(int i = 0; i < 50; i++){
             Event newEvent = new Event("Test", new Date(), new Date(), new ArrayList<String>(), 0);
