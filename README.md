@@ -10,12 +10,11 @@ To Run:
 - Clone or download this Git repository to your local machine
     - ```git clone https://github.com/wustlcse237sp20/project-personal-planner-plus.git```
 - Open command line, and navigate to the repository
-    - ```cd project-personal-planner-plus```
+    - ```cd project-personal-planner-plus/resources```
 - Run the following commands:
-    - ```mkdir bin```
-    - ```javac -d bin -cp src src/*.java```
-    - ```java -cp bin src.PlannerGUI```
-    - Note: On Mac, you may receive [an error message](./Resources/Error_Message.png), which can be disregarded
+    - ```chmod +x ./planner.sh```
+    - ```./planner.sh```
+    - Note: On Mac, you may receive [an error message](./resources/Error_Message.png), which can be disregarded
 
 ## What user stories were completed this iteration?
 - Create the UI
