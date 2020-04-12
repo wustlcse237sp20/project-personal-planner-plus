@@ -12,7 +12,7 @@ To Run:
 - Open command line, and navigate to the repository
     - ```cd project-personal-planner-plus/resources```
 - Run the following commands:
-    - ```chmod +x ./planner.sh```
+    - ```chmod +x ./planner.sh``` (only needs to be ran once)
     - ```./planner.sh```
     - Note: On Mac, you may receive [an error message](./resources/Error_Message.png), which can be disregarded
 
