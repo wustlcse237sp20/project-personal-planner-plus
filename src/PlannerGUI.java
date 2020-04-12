@@ -38,7 +38,7 @@ public class PlannerGUI extends Application
         ScrollPane scrollPane = createScrollPaneWithEvents(eventsList);
 
         eventsList.setOnMouseClicked(
-            EventTarget -> showCalendarItemDetails(EventTarget.getTarget().toString()) //.IndexedCell.getIndex().toString()
+            EventObject -> showCalendarItemDetails(EventObject.getTarget().toString()) //.IndexedCell.getIndex().toString()
         );
         
         showRootElement(primaryStage, scrollPane);
