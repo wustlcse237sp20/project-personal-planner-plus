@@ -5,6 +5,10 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent; 
+import javafx.scene.control.Button;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,16 +27,19 @@ public class PlannerGUI extends Application
     public void start(Stage primaryStage) throws Exception 
     {
         events = new ArrayList<Event>();
-        //dummy data.  delete on backend integration
+        // @TODO: Replace dummy data on backend integration
         for(int i = 0; i < 50; i++){
-            Event newEvent = new Event("Test", LocalDateTime.now(), LocalDateTime.now().plusHours(1), new ArrayList<String>(), 0);
+            Event newEvent = new Event("Test" + String.valueOf(i), LocalDateTime.now(), LocalDateTime.now().plusHours(1), new ArrayList<String>(), "dummyDetails" + String.valueOf(i), 0);
             events.add(newEvent);
         }
         primaryStage.setTitle("Personal Planner +");
 
         ListView eventsList = createListView();
         ScrollPane scrollPane = createScrollPaneWithEvents(eventsList);
-        
+
+        eventsList.setOnMouseClicked(
+            EventTarget -> showCalendarItemDetails(EventTarget.getTarget().toString()) //.IndexedCell.getIndex().toString()
+        );
         
         showRootElement(primaryStage, scrollPane);
     }
@@ -40,7 +47,7 @@ public class PlannerGUI extends Application
     private ListView createListView(){
         ListView eventsList = new ListView();
         for (Event event:events){
-            eventsList.getItems().add(event.toString());
+            eventsList.getItems().add(event.toString());           
         }
         return eventsList;
     }
@@ -59,5 +66,9 @@ public class PlannerGUI extends Application
         primaryStage.setScene(new Scene(root, 600, 700));
         primaryStage.setMaximized(true);
         primaryStage.show();
+    }
+
+    private void showCalendarItemDetails(String s){
+        System.out.println(s);
     }
 }
