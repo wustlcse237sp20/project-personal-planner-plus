@@ -9,6 +9,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent; 
 import javafx.scene.control.Button;
+import javafx.scene.control.IndexedCell;
+// import javafx.scene.control.TextField;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 public class PlannerGUI extends Application
 {
 
-    ArrayList<Event> events;
+     ArrayList<Event> events;
 
     public static void main(String[] args) {
         launch(args);
@@ -26,49 +28,65 @@ public class PlannerGUI extends Application
     @Override
     public void start(Stage primaryStage) throws Exception 
     {
-        events = new ArrayList<Event>();
-        // @TODO: Replace dummy data on backend integration
+        events = loadEvents();     
+
+        // Set title of GUI window
+        primaryStage.setTitle("Personal Planner +");
+
+        // Setup list of events
+        ListView calendarListView = createCalendarListView();
+        ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
+        calendarListView.setOnMouseClicked(
+            EventObject -> showCalendarItemDetails(( ((IndexedCell)(EventObject.getTarget())).getIndex() ))
+        );
+
+        //Create scrollable details pane
+        // TextField details = new TextField();
+        // ScrollPane detailsScrollPane = new ScrollPane();
+        // detailsScrollPane.setContent(details);
+        // detailsScrollPane.fitToWidthProperty().set(true);
+        // detailsScrollPane.pannableProperty().set(true);
+        
+        StackPane layout = new StackPane();
+        layout.getChildren().add(calendarScrollPane);
+
+        showLayout(primaryStage, layout);
+    }
+
+    public ArrayList<Event> loadEvents(){
+         // @TODO: Replace dummy data on backend integration
+        ArrayList<Event> events = new ArrayList<Event>();
         for(int i = 0; i < 50; i++){
             Event newEvent = new Event("Test" + String.valueOf(i), LocalDateTime.now(), LocalDateTime.now().plusHours(1), new ArrayList<String>(), "dummyDetails" + String.valueOf(i), 0);
             events.add(newEvent);
         }
-        primaryStage.setTitle("Personal Planner +");
-
-        ListView eventsList = createListView();
-        ScrollPane scrollPane = createScrollPaneWithEvents(eventsList);
-
-        eventsList.setOnMouseClicked(
-            EventObject -> showCalendarItemDetails(EventObject.getTarget().toString()) //.IndexedCell.getIndex().toString()
-        );
-        
-        showRootElement(primaryStage, scrollPane);
+        return events;
     }
 
-    private ListView createListView(){
-        ListView eventsList = new ListView();
+    private ListView createCalendarListView(){
+        ListView calendarListView = new ListView();
         for (Event event:events){
-            eventsList.getItems().add(event.toString());           
+            calendarListView.getItems().add(event.toString());           
         }
-        return eventsList;
+        return calendarListView;
     }
 
-    private ScrollPane createScrollPaneWithEvents(ListView eventsList){
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(eventsList);
-        scrollPane.fitToWidthProperty().set(true);
-        scrollPane.pannableProperty().set(true);
-        return scrollPane;
+    private ScrollPane listViewtoScrollPane(ListView calendarListView){
+        ScrollPane calendarScrollPane = new ScrollPane();
+        calendarScrollPane.setContent(calendarListView);
+        calendarScrollPane.fitToWidthProperty().set(true);
+        calendarScrollPane.pannableProperty().set(true);
+        return calendarScrollPane;
     }
 
-    private void showRootElement(Stage primaryStage, ScrollPane child){
-        StackPane root = new StackPane();
-        root.getChildren().add(child);
-        primaryStage.setScene(new Scene(root, 600, 700));
+    private void showLayout(Stage primaryStage, StackPane layout){
+        primaryStage.setScene(new Scene(layout, 600, 700));
         primaryStage.setMaximized(true);
         primaryStage.show();
     }
 
-    private void showCalendarItemDetails(String s){
-        System.out.println(s);
+    private void showCalendarItemDetails(int calendarIndex){
+        Event clickedEvent = events.get(calendarIndex);
+        System.out.println(clickedEvent.getDetails());
     }
 }
