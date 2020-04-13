@@ -31,7 +31,7 @@ public class PlannerGUI extends Application
         events = loadEvents();     
 
         //Create details label
-        Label calendarItemDetails = new Label("test");
+        Label calendarItemDetails = new Label("");
 
         // Setup list of events
         ListView calendarListView = createCalendarListView();
