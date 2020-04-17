@@ -2,8 +2,9 @@ package src;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -37,12 +38,13 @@ public class PlannerGUI extends Application
         ListView calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
         calendarListView.setOnMouseClicked(
-            EventObject -> showCalendarItemDetails( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails )
+            EventObject -> showCalendarItemDetails( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails)
         );
 
-        // Create layout, add items to it, display it
-        StackPane layout = new StackPane();
-        layout.getChildren().addAll(calendarScrollPane, calendarItemDetails);
+        // Create layout, add items to it, create a scene object, display it
+        BorderPane layout = new BorderPane();
+        layout.setTop(calendarScrollPane);
+        layout.setBottom(calendarItemDetails);
         showLayout(primaryStage, layout);
     }
 
@@ -72,9 +74,10 @@ public class PlannerGUI extends Application
         return calendarScrollPane;
     }
 
-    private void showLayout(Stage primaryStage, StackPane layout){
+    private void showLayout(Stage primaryStage, BorderPane layout){
         primaryStage.setTitle("Personal Planner +");
-        primaryStage.setScene(new Scene(layout, 600, 700));
+        Scene scene = new Scene(layout);  
+        primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
     }
