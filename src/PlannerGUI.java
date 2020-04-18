@@ -12,6 +12,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +27,7 @@ public class PlannerGUI extends Application
 
     ArrayList<Event> events;
     int calendarItem_LastClicked =-1;
+    boolean showDetails = false;
 
     public static void main(String[] args) {
         launch(args);
@@ -31,14 +38,23 @@ public class PlannerGUI extends Application
     {
         events = loadEvents();     
 
-        //Create details label
+        // Create details label
         Label calendarItemDetails = new Label("");
 
         // Setup list of events
         ListView calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
+
+        // Setup two listeners on the calendarItems
+        // Note that both are needed: the first accounts for the arrow keys, the second for the double-click
+        calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
+        @Override
+            public void invalidated(Observable observable) {
+                showCalendarItemDetails(((ReadOnlyIntegerProperty)observable).getValue(), calendarItemDetails, false);
+            }
+        });
         calendarListView.setOnMouseClicked(
-            EventObject -> showCalendarItemDetails( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails)
+            EventObject -> showCalendarItemDetails( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, true)
         );
 
         // Create layout, add items to it, create a scene object, display it
@@ -82,15 +98,22 @@ public class PlannerGUI extends Application
         primaryStage.show();
     }
 
-    private void showCalendarItemDetails(int calendarIndex, Label calendarItemDetails){
-        if(calendarIndex != calendarItem_LastClicked){
+    private void showCalendarItemDetails(int calendarIndex, Label calendarItemDetails, boolean mouseClicked){
+        if(mouseClicked){
+            showDetails = !showDetails;
+            if(!showDetails){
+                calendarItemDetails.setText("");
+            }
+        }
+        else {
+            if(Math.abs(calendarItem_LastClicked - calendarIndex) == 1){
+                calendarItem_LastClicked = calendarIndex;
+            }
+        }
+         if(showDetails) {
             Event clickedEvent = events.get(calendarIndex);
             calendarItemDetails.setText(clickedEvent.getDetails());
-            calendarItem_LastClicked = calendarIndex;
         }
-        else{
-            calendarItemDetails.setText("");
-            calendarItem_LastClicked = -1;
-        }
+          
     }
 }
