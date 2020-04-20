@@ -69,6 +69,7 @@ public class PlannerGUI extends Application
                         if(currIndex > -1){
                             calendarListView.getItems().remove(currIndex);
                             events.remove(currIndex);
+                            showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
                             System.out.println("del");
                         }
                     break;
