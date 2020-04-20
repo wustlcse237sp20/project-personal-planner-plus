@@ -94,4 +94,8 @@ public class Planner
     public static List<Event> getEvents() {
     	return events;
     }
+
+    public static void setEvents(List<Event> events){
+        this.events = events;
+    }
 }

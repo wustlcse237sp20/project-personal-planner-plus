@@ -21,11 +21,12 @@ import javafx.beans.property.ReadOnlyIntegerProperty;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlannerGUI extends Application
 {
 
-    ArrayList<Event> events;
+    List<Event> events;
     boolean showDetails = true;
     boolean freezeCursor = true;
     int calendarItem_lastChange =-1;
@@ -38,7 +39,7 @@ public class PlannerGUI extends Application
     @Override
     public void start(Stage primaryStage) throws Exception 
     {
-        events = loadEvents();     
+        loadEvents();     
 
         // Create details label
         Label calendarItemDetails = new Label(baseDetailMode + "OFF");
@@ -66,14 +67,10 @@ public class PlannerGUI extends Application
         showLayout(primaryStage, layout);
     }
 
-    public ArrayList<Event> loadEvents(){
-        // @TODO: Replace dummy data on backend integration
-        ArrayList<Event> events = new ArrayList<Event>();
-        for(int i = 0; i < 50; i++){
-            Event newEvent = new Event("Test" + String.valueOf(i), LocalDateTime.now(), LocalDateTime.now().plusHours(1), new ArrayList<String>(), "dummyDetails" + String.valueOf(i), 0);
-            events.add(newEvent);
-        }
-        return events;
+    public void loadEvents(){
+        Planner.initializeVars();
+        Planner.loadData();
+        events = Planner.getEvents();
     }
 
     private ListView createCalendarListView(){
