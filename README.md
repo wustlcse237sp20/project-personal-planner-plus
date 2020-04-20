@@ -17,19 +17,19 @@ To Run:
     - ```java -cp bin src.PlannerGUI```
     - Note: On Mac, you may receive [an error message](./Resources/Error_Message.png), which can be disregarded
 
-## What user stories were completed this iteration?
-- Create the UI
-- View events
+Events can be added by pressing the "a" key and deleted by selecting and pressing backspace. (Note: the display does not currently refresh after adding an event; to see an event after it's been added, exit and re-run the program.
 
-## What user stories do you intend to complete next iteration?
-- Create events
-- View event details
-- Edit events
+## What user stories were completed this iteration?
 - Delete events
 - Persist data
+
+## What user stories do you intend to complete next iteration?
+- Add event
+- Edit events
+
 ## Is there anything that you implemented but doesn't currently work?
 
-N/A
+The "Add Event" UI (and integration with backend) was implemented but the display does not refresh upon the event being added, so the feature still has some work to do.
 
 ## Resources
 
