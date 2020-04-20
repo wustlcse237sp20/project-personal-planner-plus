@@ -10,11 +10,14 @@ To Run:
 - Clone or download this Git repository to your local machine
     - ```git clone https://github.com/wustlcse237sp20/project-personal-planner-plus.git```
 - Open command line, and navigate to the repository
+    - ```cd project-personal-planner-plus```
 - Run the following commands:
     - ```mkdir bin```
     - ```javac -d bin -cp src src/*.java```
     - ```java -cp bin src.PlannerGUI```
     - Note: On Mac, you may receive [an error message](./Resources/Error_Message.png), which can be disregarded
+
+Events can be added by pressing the "a" key and deleted by selecting and pressing backspace. (Note: the display does not currently refresh after adding an event; to see an event after it's been added, exit and re-run the program.
 
 ## What user stories were completed this iteration?
 - Ability to view Event Details
@@ -33,7 +36,5 @@ To Run:
 
 ## Resources
 
-[Persistent Local storage](https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/)
-
-[JavaFX](https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/)
+[JavaFX](https://docs.oracle.com/javafx/2/get_started/jfxpub-get_started.htm)
 
