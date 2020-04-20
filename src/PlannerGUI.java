@@ -125,4 +125,10 @@ public class PlannerGUI extends Application
             freezeCursor = false;
         }
     }
+
+    @Override
+    public void stop(){
+        Planner.setEvents(events);
+        Planner.writeData();
+    }
 }
