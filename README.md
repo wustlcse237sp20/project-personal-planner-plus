@@ -22,17 +22,18 @@ Events can be added by pressing the "a" key and deleted by selecting and pressin
 ## What user stories were completed this iteration?
 - Ability to view Event Details
 - Ability to create new events
-- Ability to edit events
 - Ability to delete events
 
 ## What user stories do you intend to complete next iteration?
 - Search Events by title
+- Ability to edit events
 - Create event tags and filter events by tag
 - View events by month
 
 ## Is there anything that you implemented but doesn't currently work?
 
 - We currently have a bug that occurs when events list in the GUI is not filled and the user clicks a part of the list that is not an event.  This causes an error on the console.
+- Display does not update after adding an event.  If you close the GUI and run a second time the event will appear
 
 ## Resources
 
