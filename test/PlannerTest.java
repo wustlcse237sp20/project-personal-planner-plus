@@ -49,7 +49,7 @@ public class PlannerTest
 		
 		Planner.addEvent(eventName, startDate, endDate, tags, details);
 
-		ArrayList<Event> eventsList = Planner.getEvents();
+		List<Event> eventsList = Planner.getEvents();
 
 		Planner.writeData();
 		Planner.setEvents(new ArrayList<Event>());

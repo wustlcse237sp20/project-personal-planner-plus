@@ -28,8 +28,12 @@ public class Planner
 
     public static void writeData(){
         // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
+        File eventFile = new File(DATA_FILE_NAME);
+        if (eventFile.exists()){
+            eventFile.delete();
+        }
         try{
-            FileOutputStream fileStream = new FileOutputStream(new File(DATA_FILE_NAME));
+            FileOutputStream fileStream = new FileOutputStream(eventFile);
             ObjectOutputStream objStream = new ObjectOutputStream(fileStream);
             
             objStream.writeObject(events);
@@ -95,7 +99,7 @@ public class Planner
     	return events;
     }
 
-    public static void setEvents(List<Event> events){
-        this.events = events;
+    public static void setEvents(List<Event> newEvents){
+        events = newEvents;
     }
 }
