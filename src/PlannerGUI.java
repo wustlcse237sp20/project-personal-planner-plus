@@ -26,8 +26,10 @@ public class PlannerGUI extends Application
 {
 
     ArrayList<Event> events;
-    int calendarItem_LastClicked =-1;
-    boolean showDetails = false;
+    boolean showDetails = true;
+    boolean freezeCursor = true;
+    int calendarItem_lastChange =-1;
+    String baseDetailMode = "Detail Mode ";
 
     public static void main(String[] args) {
         launch(args);
@@ -39,7 +41,7 @@ public class PlannerGUI extends Application
         events = loadEvents();     
 
         // Create details label
-        Label calendarItemDetails = new Label("");
+        Label calendarItemDetails = new Label(baseDetailMode + "OFF");
 
         // Setup list of events
         ListView calendarListView = createCalendarListView();
@@ -50,11 +52,11 @@ public class PlannerGUI extends Application
         calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
         @Override
             public void invalidated(Observable observable) {
-                showCalendarItemDetails(((ReadOnlyIntegerProperty)observable).getValue(), calendarItemDetails, false);
+                showCalendarItemDetailsChange(((ReadOnlyIntegerProperty)observable).getValue(), calendarItemDetails, calendarListView);
             }
         });
         calendarListView.setOnMouseClicked(
-            EventObject -> showCalendarItemDetails( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, true)
+            EventObject -> showCalendarItemDetailsClick( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView)
         );
 
         // Create layout, add items to it, create a scene object, display it
@@ -98,22 +100,32 @@ public class PlannerGUI extends Application
         primaryStage.show();
     }
 
-    private void showCalendarItemDetails(int calendarIndex, Label calendarItemDetails, boolean mouseClicked){
-        if(mouseClicked){
+    private void showCalendarItemDetailsChange(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
+        if(calendarIndex_Change >= 0) {
+            System.out.println("changed: " + calendarIndex_Change);
+            Event clickedEvent = events.get(calendarIndex_Change);
+            calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
+            calendarItem_lastChange = calendarIndex_Change;
+            showDetails = true;
+            freezeCursor = true;
+        }
+    }
+
+     private void showCalendarItemDetailsClick(int calendarIndexClick, Label calendarItemDetails, ListView calendarListView){
+        System.out.println("click:" + calendarIndexClick + " calendarItem_lastChange:" + calendarItem_lastChange);
+        if(calendarItem_lastChange  == calendarIndexClick && !freezeCursor){ 
             showDetails = !showDetails;
-            if(!showDetails){
-                calendarItemDetails.setText("");
+            if(showDetails){
+                    Event clickedEvent = events.get(calendarIndexClick);
+                    calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
+            }
+            else{
+                    calendarListView.getSelectionModel().clearSelection();
+                    calendarItemDetails.setText(baseDetailMode +  "OFF");
             }
         }
-        else {
-            if(Math.abs(calendarItem_LastClicked - calendarIndex) == 1){
-                calendarItem_LastClicked = calendarIndex;
-            }
+        else{
+            freezeCursor = false;
         }
-         if(showDetails) {
-            Event clickedEvent = events.get(calendarIndex);
-            calendarItemDetails.setText(clickedEvent.getDetails());
-        }
-          
     }
 }
