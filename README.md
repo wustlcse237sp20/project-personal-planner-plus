@@ -29,7 +29,7 @@ To Run:
 
 ## Is there anything that you implemented but doesn't currently work?
 
-N/A
+- We currently have a bug that occurs when events list in the GUI is not filled and the user clicks a part of the list that is not an event.  This causes an error on the console.
 
 ## Resources
 
