@@ -20,16 +20,19 @@ To Run:
 Events can be added by pressing the "a" key and deleted by selecting and pressing backspace. (Note: the display does not currently refresh after adding an event; to see an event after it's been added, exit and re-run the program.
 
 ## What user stories were completed this iteration?
-- Delete events
-- Persist data
+- Ability to view Event Details
+- Ability to create new events
+- Ability to edit events
+- Ability to delete events
 
 ## What user stories do you intend to complete next iteration?
-- Add event
-- Edit events
+- Search Events by title
+- Create event tags and filter events by tag
+- View events by month
 
 ## Is there anything that you implemented but doesn't currently work?
 
-The "Add Event" UI (and integration with backend) was implemented but the display does not refresh upon the event being added, so the feature still has some work to do.
+- We currently have a bug that occurs when events list in the GUI is not filled and the user clicks a part of the list that is not an event.  This causes an error on the console.
 
 ## Resources
 
