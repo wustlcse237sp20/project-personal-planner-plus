@@ -8,13 +8,15 @@ public class Event implements Comparable{
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private ArrayList<String> tags;
+    private String details;
     private int id;
 
-    public Event(String name,  LocalDateTime startDate, LocalDateTime endDate, ArrayList<String> tags, int id){
+    public Event(String name,  LocalDateTime startDate, LocalDateTime endDate, ArrayList<String> tags, String details, int id){
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.tags = tags;
+        this.details = details;
         this.id = id;
     }
 
@@ -32,6 +34,10 @@ public class Event implements Comparable{
 
     public ArrayList<String> getTags(){
         return this.tags;
+    }
+
+    public String getDetails(){
+        return this.details;
     }
 
     public int getId(){
@@ -52,6 +58,10 @@ public class Event implements Comparable{
 
     public void addTag(String tag){
         this.tags.add(tag);
+    }
+
+    public void setDetails(String details){
+        this.details = details;
     }
 
     public String toString(){

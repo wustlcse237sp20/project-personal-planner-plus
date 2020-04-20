@@ -80,8 +80,8 @@ public class Planner
         }
     }
     
-    public static void addEvent(String name, LocalDateTime startDate, LocalDateTime endDate, ArrayList<String> tags){
-        Event event = new Event(name, startDate, endDate, tags, nextId);
+    public static void addEvent(String name, LocalDateTime startDate, LocalDateTime endDate, ArrayList<String> tags, String details){
+        Event event = new Event(name, startDate, endDate, tags, details, nextId);
         nextId++;
         events.add(event);
         Collections.sort(events); // TODO ask prof about unchecked sort invocation
