@@ -12,8 +12,8 @@ public class EventTest
 {
     @Test
     public void testCompare(){
-        Event event1 = new Event("event 1",  LocalDateTime.now(), LocalDateTime.now().plusMinutes(5), new ArrayList<String>(), 0);
-        Event event2 = new Event("event 2", LocalDateTime.now().plusMinutes(5), LocalDateTime.now().plusMinutes(10), new ArrayList<String>(), 0);
+        Event event1 = new Event("event 1",  LocalDateTime.now(), LocalDateTime.now().plusMinutes(5), new ArrayList<String>(), "Test Details", 0);
+        Event event2 = new Event("event 2", LocalDateTime.now().plusMinutes(5), LocalDateTime.now().plusMinutes(10), new ArrayList<String>(), "Test Details 2", 0);
 
         assertTrue("event1 not < event2 when event1 start time precedes event2 start time", event1.compareTo(event2) < 0);
 

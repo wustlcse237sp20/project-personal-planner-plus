@@ -1,9 +1,10 @@
 package src;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class Event implements Comparable{
+public class Event implements Comparable, Serializable{
     private String name;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
@@ -82,6 +83,17 @@ public class Event implements Comparable{
         return startDate.format(formatter) + "\t" + name;
     }
 
+//    for debugging purposes
+    public String allFields() {
+        return new String(this.name + "\n"
+        		+ this.startDate + "\n"
+        		+ this.endDate + "\n"
+        		+ this.tags
+        		+ "\n"
+        		+ this.details + "\n" 
+        		+ this.id);
+    }
+    
     @Override
     public int compareTo(Object o) {
         Event otherEvent = (Event)o;
@@ -98,4 +110,41 @@ public class Event implements Comparable{
         }
         return startDateComp;
     }
+    
+    public boolean equals(Object o) {
+    	Event otherEvent;
+    	if(o instanceof Event) {
+    		otherEvent = (Event)o;
+    	}
+    	else {
+    		return false;
+    	}
+    	
+    	if(!this.name.equals(otherEvent.name)) {
+    		System.out.println("this.name (" + this.name + ") != otherEvent.name (" + otherEvent.name + ")");
+    	}
+    	if(!this.startDate.equals(otherEvent.startDate)) {
+    		System.out.println("this.startDate (" + this.startDate + ") != otherEvent.startDate (" + otherEvent.startDate + ")");
+    	}
+    	if(!this.endDate.equals(otherEvent.endDate)) {
+    		System.out.println("this.endDate (" + this.endDate + ") != otherEvent.endDate (" + otherEvent.endDate + ")");
+    	}
+    	if(!this.tags.equals(otherEvent.tags)) {
+    		System.out.println("this.tags (" + this.tags + ") != otherEvent.tags (" + otherEvent.tags + ")");
+    	}
+    	if(!this.details.equals(otherEvent.details)) {
+    		System.out.println("this.details (" + this.details + ") != otherEvent.details (" + otherEvent.details + ")");
+    	}
+    	if(this.id != otherEvent.id) {
+    		System.out.println("this.id (" + this.id + ") != otherEvent.startDate (" + otherEvent.id + ")");
+    	}
+    	
+        return this.name.equals(otherEvent.name) && 
+        	   this.startDate.equals(otherEvent.startDate) &&
+        	   this.endDate.equals(otherEvent.endDate) &&
+        	   this.tags.equals(otherEvent.tags) &&
+        	   this.details.equals(otherEvent.details) &&
+        	   this.id == otherEvent.id;
+    }
+    
 }

@@ -6,25 +6,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent; 
-import javafx.scene.control.Button;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.scene.input.KeyEvent;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 
 public class PlannerGUI extends Application
 {
-    ArrayList<Event> events;
+    List<Event> events;
     boolean showDetails = true;
     boolean freezeCursor = true;
     int calendarItem_lastChange =-1;
@@ -37,7 +30,7 @@ public class PlannerGUI extends Application
     @Override
     public void start(Stage primaryStage) throws Exception 
     {
-        events = loadEvents();     
+        loadEvents();     
 
         // Create details label
         Label calendarItemDetails = new Label(baseDetailMode + "OFF");
@@ -81,14 +74,10 @@ public class PlannerGUI extends Application
         showLayout(primaryStage, layout, scene);
     }
 
-    public ArrayList<Event> loadEvents(){
-        // @TODO: Replace dummy data on backend integration
-        ArrayList<Event> events = new ArrayList<Event>();
-        for(int i = 0; i < 50; i++){
-            Event newEvent = new Event("Test" + String.valueOf(i), LocalDateTime.now(), LocalDateTime.now().plusHours(1), new ArrayList<String>(), "dummyDetails" + String.valueOf(i), 0);
-            events.add(newEvent);
-        }
-        return events;
+    public void loadEvents(){
+        Planner.initializeVars();
+        Planner.loadData();
+        events = Planner.getEvents();
     }
 
     private ListView createCalendarListView(){
@@ -117,7 +106,7 @@ public class PlannerGUI extends Application
     private void showCalendarItemDetailsChange(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
         if(calendarIndex_Change >= 0) {
             Event clickedEvent = events.get(calendarIndex_Change);
-            calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
+            calendarItemDetails.setText(clickedEvent.getDetails());
             calendarItem_lastChange = calendarIndex_Change;
             showDetails = true;
             freezeCursor = true;
@@ -139,5 +128,11 @@ public class PlannerGUI extends Application
         else{
             freezeCursor = false;
         }
+    }
+
+    @Override
+    public void stop(){
+        Planner.setEvents(events);
+        Planner.writeData();
     }
 }
