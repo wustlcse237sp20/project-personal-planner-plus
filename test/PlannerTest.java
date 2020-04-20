@@ -1,5 +1,6 @@
 package test;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,12 +52,12 @@ public class PlannerTest
 		Planner.addEvent(eventName, startDate, endDate, tags, details);
 
 		List<Event> eventsList = Planner.getEvents();
-
 		Planner.writeData();
 		Planner.setEvents(new ArrayList<Event>());
 		Planner.loadData();
+		
+		assertTrue("Data was not loaded properly", eventsList.equals(Planner.getEvents()));			
 
-		assertTrue("Data was not loaded properly", eventsList.equals(Planner.getEvents()));
-
+		
 	}
 }

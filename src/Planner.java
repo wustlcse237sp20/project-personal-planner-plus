@@ -94,7 +94,6 @@ public class Planner
         }
     }
     
-//   For unit testing purposes
     public static List<Event> getEvents() {
     	return events;
     }
