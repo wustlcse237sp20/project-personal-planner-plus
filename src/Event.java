@@ -3,16 +3,18 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Event implements Comparable, Serializable{
-    private String name;
+	private static final long serialVersionUID = 4L;
+	private String name;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private ArrayList<String> tags;
+    private List<String> tags;
     private String details;
     private int id;
 
-    public Event(String name,  LocalDateTime startDate, LocalDateTime endDate, ArrayList<String> tags, String details, int id){
+    public Event(String name,  LocalDateTime startDate, LocalDateTime endDate, List<String> tags, String details, int id){
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -33,7 +35,7 @@ public class Event implements Comparable, Serializable{
         return this.endDate;
     }
 
-    public ArrayList<String> getTags(){
+    public List<String> getTags(){
         return this.tags;
     }
 

@@ -84,7 +84,7 @@ public class Planner
         }
     }
     
-    public static void addEvent(String name, LocalDateTime startDate, LocalDateTime endDate, ArrayList<String> tags, String details){
+    public static void addEvent(String name, LocalDateTime startDate, LocalDateTime endDate, List<String> tags, String details){
         Event event = new Event(name, startDate, endDate, tags, details, nextId);
         nextId++;
         events.add(event);
