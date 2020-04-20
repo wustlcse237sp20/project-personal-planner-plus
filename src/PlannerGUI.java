@@ -6,21 +6,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent; 
-import javafx.scene.control.Button;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlannerGUI extends Application
@@ -99,9 +91,8 @@ public class PlannerGUI extends Application
 
     private void showCalendarItemDetailsChange(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
         if(calendarIndex_Change >= 0) {
-            System.out.println("changed: " + calendarIndex_Change);
             Event clickedEvent = events.get(calendarIndex_Change);
-            calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
+            calendarItemDetails.setText(clickedEvent.getDetails());
             calendarItem_lastChange = calendarIndex_Change;
             showDetails = true;
             freezeCursor = true;
