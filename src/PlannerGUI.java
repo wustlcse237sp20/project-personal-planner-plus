@@ -1,38 +1,38 @@
 package src;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.control.ListView;
-import javafx.stage.Stage;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.IndexedCell;
-import javafx.scene.control.Label;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.IndexedCell;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
+import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class PlannerGUI extends Application
 {
-    List<Event> events;
-    boolean showDetails = true;
-    boolean freezeCursor = true;
-    int calendarItem_lastChange =-1;
-    final String baseDetailMode = "Detail Mode ";
+    private List<Event> events;
+    private boolean showDetails = true;
+    private boolean freezeCursor = true;
+    private int calendarItem_lastChange =-1;
+    private final String baseDetailMode = "Detail Mode ";
 
     public static void main(String[] args) {
         launch(args);
@@ -50,7 +50,7 @@ public class PlannerGUI extends Application
         ListView calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
 
-        // Setup two listeners on the calendarItems: the first accounts for the arrow keys, the second for the double-click
+        // Setup two listeners on the calendarItems: the first fires on any chance e.g. the arrow keys, the second for the double-click; both are needed
         calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
         @Override
             public void invalidated(Observable observable) {
@@ -63,6 +63,8 @@ public class PlannerGUI extends Application
 
         // Create layout, add items to it, create a scene object w listeners, display the layout
         BorderPane layout = new BorderPane();
+        layout.setTop(calendarScrollPane);
+        layout.setBottom(calendarItemDetails);
         Scene scene = new Scene(layout);  
           scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
@@ -74,7 +76,6 @@ public class PlannerGUI extends Application
                             calendarListView.getItems().remove(currIndex);
                             events.remove(currIndex);
                             showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
-                            System.out.println("del");
                         }
                     case A:
                     	showAddEvent();
@@ -82,9 +83,7 @@ public class PlannerGUI extends Application
                 }
             }
         });
-        layout.setTop(calendarScrollPane);
-        layout.setBottom(calendarItemDetails);
-        showLayout(primaryStage, layout, scene);
+        showLayout(primaryStage, scene);
     }
 
     public void loadEvents(){
@@ -109,7 +108,7 @@ public class PlannerGUI extends Application
         return calendarScrollPane;
     }
 
-    private void showLayout(Stage primaryStage, BorderPane layout, Scene scene){
+    private void showLayout(Stage primaryStage, Scene scene){
         primaryStage.setTitle("Personal Planner +");
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
@@ -134,8 +133,8 @@ public class PlannerGUI extends Application
                 calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
             }
             else{
-                    calendarListView.getSelectionModel().clearSelection();
-                    calendarItemDetails.setText(baseDetailMode +  "OFF");
+                calendarListView.getSelectionModel().clearSelection();
+                calendarItemDetails.setText(baseDetailMode +  "OFF");
             }
         }
         else{
@@ -143,15 +142,10 @@ public class PlannerGUI extends Application
         }
     }
 
+    // Adapted from:
+    // quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
     private void showAddEvent() {
-//    	https://www.quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
-        Stage stage = new Stage();
-        
-        VBox box = new VBox();
  
-        Label label = new Label("New event:");
- 
-        
         TextField nameField = new TextField();
         nameField.setPromptText("enter event name");
 
@@ -179,19 +173,19 @@ public class PlannerGUI extends Application
  
         TextField detailText = new TextField();
         detailText.setPromptText("enter description");
-
         
         Button btnAdd = new Button();
         btnAdd.setText("Add event");
  
+        Stage stage = new Stage();
+
         btnAdd.setOnAction(new EventHandler<ActionEvent>() {
- 
             @Override
             public void handle(ActionEvent event) {
             	String name = nameField.getText();
             	LocalDateTime start = startDatePicker.getValue().atTime(startSpinner.getValue());
             	LocalDateTime end = endDatePicker.getValue().atTime(endSpinner.getValue());
-            	List<String> tags = Arrays.asList(textTags.getText().split(","));
+            	List<String> tags = Arrays.asList(textTags.getText().split(",")); //@TODO: Sanitize input
             	String details = detailText.getText();
             	
             	Planner.addEvent(name, start, end, tags, details);
@@ -199,16 +193,18 @@ public class PlannerGUI extends Application
             	stage.close(); // return to main window
             }
         });
- 
-        box.getChildren().add(label);
-        box.getChildren().add(nameField);
-        box.getChildren().add(startDatePicker);
-        box.getChildren().add(startSpinner);
-        box.getChildren().add(endDatePicker);
-        box.getChildren().add(endSpinner);
-        box.getChildren().add(textTags);
-        box.getChildren().add(detailText);
-        box.getChildren().add(btnAdd);
+        VBox box = new VBox();
+        Label label = new Label("New event:");
+        box.getChildren().addAll(
+            label, 
+            nameField, 
+            startDatePicker, 
+            startSpinner,
+            endDatePicker, 
+            endSpinner, 
+            textTags, 
+            detailText, 
+            btnAdd);
         Scene scene = new Scene(box, 250, 500);
         stage.setScene(scene);
         stage.show();    	
