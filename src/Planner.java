@@ -98,7 +98,27 @@ public class Planner
     	return events;
     }
 
+    public static List<Event> getFilteredEvents(String filter) {
+        if (filter == "all"){
+            return events;
+        }
+        List<Event> filtered = new ArrayList<Event>();
+        for (Event e : events){
+            for (String tag : e.tags){
+                if (tag.equals(filter)){
+                    filtered.add(event);
+                    continue;
+                }
+            }
+        }
+        return filtered;
+    }
+
     public static void setEvents(List<Event> newEvents){
         events = newEvents;
+    }
+
+    public static Set<String> getTagSet() {
+        return tagSet;
     }
 }

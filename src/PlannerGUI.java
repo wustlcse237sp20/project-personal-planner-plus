@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
+import javafx.scene.control.ComboBox;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -85,6 +86,12 @@ public class PlannerGUI extends Application
         layout.setTop(calendarScrollPane);
         layout.setBottom(calendarItemDetails);
         showLayout(primaryStage, layout, scene);
+
+        ComboBox tagBox = new ComboBox();
+        tagBox.getItems().add("all");
+        for (String tag : Planner.getTagSet()){
+            tagBox.getItems().add(tag);
+        }
     }
 
     public void loadEvents(){
