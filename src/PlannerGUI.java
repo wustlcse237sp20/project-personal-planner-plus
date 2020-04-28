@@ -17,6 +17,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
+import javafx.geometry.Insets;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -34,6 +39,7 @@ public class PlannerGUI extends Application
     private boolean freezeCursor = true;
     private int calendarItem_lastChange =-1;
     private final String baseDetailMode = "Detail Mode ";
+    private final Rectangle2D screenSize = Screen.getPrimary().getBounds();
 
     public static void main(String[] args) {
         launch(args);
@@ -51,7 +57,7 @@ public class PlannerGUI extends Application
         ListView calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
 
-        // Setup two listeners on the calendarItems: the first fires on any chance e.g. the arrow keys, the second for the double-click; both are needed
+        // Setup two listeners on the calendarItems: the first fires on any change e.g. the arrow keys; the second for the double-click; both are needed
         calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
         @Override
             public void invalidated(Observable observable) {
@@ -62,13 +68,31 @@ public class PlannerGUI extends Application
             EventObject -> showCalendarItemDetailsClick( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView)
         );
 
-        // Create search tool
+         // Create search tool
         TextField searchBar = new TextField();
         searchBar.setPromptText("Search Query...");
+        searchBar.setMinWidth(screenSize.getWidth() * 2 / 3.0); // search max 2/3 width
+
+        // Create add button 
+        Button newItemBtn = new Button();
+        newItemBtn.setText("New Event");
+        newItemBtn.setMinWidth(screenSize.getWidth() / 3.0); // button max 1/3 width
+        newItemBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showAddEvent(calendarListView);
+            }
+        });
+
+        // Create hBox for the top row
+        HBox firstRow = new HBox();
+        firstRow.setPadding(new Insets(10, 10, 10, 10)); // padding of hbox
+        firstRow.setSpacing(10); // space between children
+        firstRow.getChildren().addAll(searchBar, newItemBtn);
 
         // Create layout, add items to it
         BorderPane layout = new BorderPane();
-        layout.setTop(searchBar);
+        layout.setTop(firstRow);  
         layout.setCenter(calendarScrollPane);
         layout.setBottom(calendarItemDetails);
 
