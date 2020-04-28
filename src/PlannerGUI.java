@@ -61,10 +61,17 @@ public class PlannerGUI extends Application
             EventObject -> showCalendarItemDetailsClick( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView)
         );
 
-        // Create layout, add items to it, create a scene object w listeners, display the layout
+        // Create search tool
+        TextField searchBar = new TextField();
+        searchBar.setPromptText("Search Query...");
+
+        // Create layout, add items to it
         BorderPane layout = new BorderPane();
-        layout.setTop(calendarScrollPane);
+        layout.setTop(searchBar);
+        layout.setCenter(calendarScrollPane);
         layout.setBottom(calendarItemDetails);
+
+        // Create a scene object with listeners 
         Scene scene = new Scene(layout);  
           scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
@@ -77,13 +84,24 @@ public class PlannerGUI extends Application
                             events.remove(currIndex);
                             showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
                         }
+                        break;
                     case A:
-                    	showAddEvent();
+                        if("".equals(searchBar.getText())){ // @TODO: This if is a temp fix; pressing 'A' in the search box adds event
+                    	    showAddEvent();
+                        }
+                        else{
+                            System.out.println("errant a press");
+                        }
+                        break;
+                    case ENTER:
+                    	searchCalendar(searchBar.getText(), calendarListView);
                     break;
                 }
             }
         });
-        showLayout(primaryStage, scene);
+
+        // Display the layout
+        showLayout(primaryStage, scene); 
     }
 
     public void loadEvents(){
@@ -139,6 +157,24 @@ public class PlannerGUI extends Application
         }
         else{
             freezeCursor = false;
+        }
+    }
+
+    private void searchCalendar(String query, ListView calendarListView){
+        // Reset calendarListView
+        calendarListView.getItems().clear();
+        for (Event event:events){
+            calendarListView.getItems().add(event.toString());           
+        }
+
+        // Execute search
+        int index = 0;
+        for (Event event:events){
+            if(! event.toString().contains(query)){
+                System.out.println("Removal at: " + index);
+                calendarListView.getItems().remove(index);
+            } 
+            index++;          
         }
     }
 
