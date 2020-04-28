@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -87,14 +88,14 @@ public class PlannerGUI extends Application
                         break;
                     case A:
                         if("".equals(searchBar.getText())){ // @TODO: This if is a temp fix; pressing 'A' in the search box adds event
-                            showAddEvent(calendarListView);
+                        	showAddEvent(calendarListView);
                         }
                         else{
                             System.out.println("errant a press");
                         }
                         break;
                     case ENTER:
-                        searchCalendar(searchBar.getText(), calendarListView);
+                    	searchCalendar(searchBar.getText(), calendarListView);
                     break;
                 }
             }
@@ -188,21 +189,25 @@ public class PlannerGUI extends Application
         DatePicker startDatePicker = new DatePicker();
         startDatePicker.setPromptText("enter start date and time");
         startDatePicker.setOnAction(new EventHandler() {
-            @Override
-            public void handle(javafx.event.Event event) {      
-            }
+        	@Override
+        	public void handle(javafx.event.Event event) {
+			
+        		}
         });
-        TimeSpinner startSpinner = new TimeSpinner();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm:ss");
+        
+        TextField startTimeField = new TextField();
+        startTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
+        
 
         DatePicker endDatePicker = new DatePicker();
         endDatePicker.setPromptText("enter end date and time");
         endDatePicker.setOnAction(new EventHandler() {
-            @Override
-            public void handle(javafx.event.Event event) {          
-            }
+        	@Override
+        		public void handle(javafx.event.Event event) {
+        		}
         });
-        TimeSpinner endSpinner = new TimeSpinner();
+        TextField endTimeField = new TextField();
+        endTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
 
         TextField textTags = new TextField();
         textTags.setPromptText("enter tag(s), separated by commas");
@@ -218,21 +223,92 @@ public class PlannerGUI extends Application
         btnAdd.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String name = nameField.getText();
-                LocalDateTime start = startDatePicker.getValue().atTime(startSpinner.getValue());
-                LocalDateTime end = endDatePicker.getValue().atTime(endSpinner.getValue());
-                List<String> tags = Arrays.asList(textTags.getText().split(",")); //@TODO: Sanitize input
-                String details = detailText.getText();
-                
-                Planner.addEvent(name, start, end, tags, details);
+            	boolean inputValid = true;
+	            String name = nameField.getText();
 
-                // Reset calendarListView
-                calendarListView.getItems().clear();
-                for (Event calendarItem:events){
-                    calendarListView.getItems().add(calendarItem.toString());           
-                }
-                
-                stage.close(); // return to main window
+	            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+	            
+	            String startTimeText = startTimeField.getText();
+	            // convert e.g. 1:23 to 01:23
+	            if(startTimeText.length() == 4 && startTimeText.charAt(1) == ':') {
+	            	startTimeText = "0"+startTimeText;
+	            }
+	            
+	            LocalDateTime start = null;
+	            LocalDate startDate = startDatePicker.getValue();
+	            
+	            // input validation: in case start date is empty
+	            if(startDate == null) {
+	            	inputValid = false;
+	            	startDatePicker.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            else {
+	            	startDatePicker.setStyle("-fx-background-color: white");
+	            }
+	            
+	            // input validation: in case startTime parsing throws exception
+	            try {
+	            	LocalTime startTime = LocalTime.parse(startTimeText, formatter);
+	            	if(startDate != null) {
+	            		start = startDate.atTime(startTime);	            	
+	            	}
+	            	startTimeField.setStyle("-fx-background-color: white"); // only happens if no exception!
+	            }
+	            catch(DateTimeParseException e) {
+	            	inputValid = false;
+	            	startTimeField.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            
+	            String endTimeText = endTimeField.getText();
+	            if(endTimeText.length() == 4 && endTimeText.charAt(1) == ':') {
+	            	endTimeText = "0"+endTimeText;
+	            }
+	            
+	            LocalDateTime end = null;
+	            LocalDate endDate = endDatePicker.getValue();
+	            
+	            // input validation: in case end date is empty
+	            if(endDate == null) {
+	            	inputValid = false;
+	            	endDatePicker.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            
+	            // input validation: in case endTime parsing throws exception
+	            try {
+		            LocalTime endTime = LocalTime.parse(endTimeText, formatter);
+		            if(endDate != null) {
+		            	end = endDate.atTime(endTime);
+		            }
+	            	endTimeField.setStyle("-fx-background-color: white");
+
+	            }
+	            catch(DateTimeParseException e) {
+	            	inputValid = false;
+	            	endTimeField.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            
+	            List<String> tags = Arrays.asList(textTags.getText().split(",")); //@TODO: Sanitize input
+	            String details = detailText.getText();
+	            
+	            // input validation: in case event does not have name
+	            if(name.equals("")) {
+	            	inputValid = false;
+	            	nameField.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            else {
+	            	nameField.setStyle("-fx-background-color: white");
+	            }
+	            
+	            if(inputValid) {
+	            	Planner.addEvent(name, start, end, tags, details);
+	            	
+	            	// Reset calendarListView
+	            	calendarListView.getItems().clear();
+	            	for (Event calendarItem:events){
+	            		calendarListView.getItems().add(calendarItem.toString());           
+	            	}
+	            	stage.close(); // return to main window	            	
+	            }
             }
         });
         VBox box = new VBox();
@@ -241,15 +317,15 @@ public class PlannerGUI extends Application
             label, 
             nameField, 
             startDatePicker, 
-            startSpinner,
+            startTimeField,
             endDatePicker, 
-            endSpinner, 
+            endTimeField, 
             textTags, 
             detailText, 
             btnAdd);
         Scene scene = new Scene(box, 250, 500);
         stage.setScene(scene);
-        stage.show();       
+        stage.show();
     }
      
     @Override
