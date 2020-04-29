@@ -110,14 +110,6 @@ public class PlannerGUI extends Application
                             showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
                         }
                         break;
-                    case A:
-                        if("".equals(searchBar.getText())){ // @TODO: This if is a temp fix; pressing 'A' in the search box adds event
-                        	showAddEvent(calendarListView);
-                        }
-                        else{
-                            System.out.println("errant a press");
-                        }
-                        break;
                     case ENTER:
                     	searchCalendar(searchBar.getText(), calendarListView);
                     break;
