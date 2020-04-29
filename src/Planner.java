@@ -104,9 +104,9 @@ public class Planner
         }
         List<Event> filtered = new ArrayList<Event>();
         for (Event e : events){
-            for (String tag : e.tags){
+            for (String tag : e.getTags()){
                 if (tag.equals(filter)){
-                    filtered.add(event);
+                    filtered.add(e);
                     continue;
                 }
             }
