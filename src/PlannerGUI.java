@@ -1,38 +1,45 @@
 package src;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.control.ListView;
-import javafx.stage.Stage;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.IndexedCell;
-import javafx.scene.control.Label;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.IndexedCell;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.geometry.Pos;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
+import javafx.geometry.Insets;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class PlannerGUI extends Application
 {
-    List<Event> events;
-    boolean showDetails = true;
-    boolean freezeCursor = true;
-    int calendarItem_lastChange =-1;
-    final String baseDetailMode = "Detail Mode ";
+    private List<Event> events;
+    private boolean showDetails = true;
+    private boolean freezeCursor = true;
+    private int calendarItem_lastChange =-1;
+    private final String baseDetailMode = "Detail Mode ";
+    private final Rectangle2D screenSize = Screen.getPrimary().getBounds();
 
     public static void main(String[] args) {
         launch(args);
@@ -50,7 +57,7 @@ public class PlannerGUI extends Application
         ListView calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
 
-        // Setup two listeners on the calendarItems: the first accounts for the arrow keys, the second for the double-click
+        // Setup two listeners on the calendarItems: the first fires on any change e.g. the arrow keys; the second for the double-click; both are needed
         calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
         @Override
             public void invalidated(Observable observable) {
@@ -61,8 +68,35 @@ public class PlannerGUI extends Application
             EventObject -> showCalendarItemDetailsClick( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView)
         );
 
-        // Create layout, add items to it, create a scene object w listeners, display the layout
+         // Create search tool
+        TextField searchBar = new TextField();
+        searchBar.setPromptText("Search Query...");
+        searchBar.setMinWidth(screenSize.getWidth() * 2 / 3.0); // search max 2/3 width
+
+        // Create add button 
+        Button newItemBtn = new Button();
+        newItemBtn.setText("New Event");
+        newItemBtn.setMinWidth(screenSize.getWidth() / 3.0); // button max 1/3 width
+        newItemBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showAddEvent(calendarListView);
+            }
+        });
+
+        // Create hBox for the top row
+        HBox firstRow = new HBox();
+        firstRow.setPadding(new Insets(10, 10, 10, 10)); // padding of hbox
+        firstRow.setSpacing(10); // space between children
+        firstRow.getChildren().addAll(searchBar, newItemBtn);
+
+        // Create layout, add items to it
         BorderPane layout = new BorderPane();
+        layout.setTop(firstRow);  
+        layout.setCenter(calendarScrollPane);
+        layout.setBottom(calendarItemDetails);
+
+        // Create a scene object with listeners 
         Scene scene = new Scene(layout);  
           scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
@@ -74,17 +108,17 @@ public class PlannerGUI extends Application
                             calendarListView.getItems().remove(currIndex);
                             events.remove(currIndex);
                             showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
-                            System.out.println("del");
                         }
-                    case A:
-                    	showAddEvent();
+                        break;
+                    case ENTER:
+                    	searchCalendar(searchBar.getText(), calendarListView);
                     break;
                 }
             }
         });
-        layout.setTop(calendarScrollPane);
-        layout.setBottom(calendarItemDetails);
-        showLayout(primaryStage, layout, scene);
+
+        // Display the layout
+        showLayout(primaryStage, scene); 
     }
 
     public void loadEvents(){
@@ -109,7 +143,7 @@ public class PlannerGUI extends Application
         return calendarScrollPane;
     }
 
-    private void showLayout(Stage primaryStage, BorderPane layout, Scene scene){
+    private void showLayout(Stage primaryStage, Scene scene){
         primaryStage.setTitle("Personal Planner +");
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
@@ -134,8 +168,8 @@ public class PlannerGUI extends Application
                 calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
             }
             else{
-                    calendarListView.getSelectionModel().clearSelection();
-                    calendarItemDetails.setText(baseDetailMode +  "OFF");
+                calendarListView.getSelectionModel().clearSelection();
+                calendarItemDetails.setText(baseDetailMode +  "OFF");
             }
         }
         else{
@@ -143,75 +177,182 @@ public class PlannerGUI extends Application
         }
     }
 
-    private void showAddEvent() {
-//    	https://www.quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
-        Stage stage = new Stage();
-        
-        VBox box = new VBox();
+    private void searchCalendar(String query, ListView calendarListView){
+        // Reset calendarListView
+        calendarListView.getItems().clear();
+        for (Event event:events){
+            calendarListView.getItems().add(event.toString());           
+        }
+
+        // Execute search
+        int index = 0;
+        for (Event event:events){
+            if(! event.toString().contains(query)){
+                System.out.println("Removal at: " + index);
+                calendarListView.getItems().remove(index);
+            } 
+            index++;          
+        }
+    }
+
+    // Adapted from:
+    // quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
+    private void showAddEvent(ListView calendarListView) {
  
-        Label label = new Label("New event:");
- 
-        
         TextField nameField = new TextField();
         nameField.setPromptText("enter event name");
 
         DatePicker startDatePicker = new DatePicker();
         startDatePicker.setPromptText("enter start date and time");
         startDatePicker.setOnAction(new EventHandler() {
-			@Override
-			public void handle(javafx.event.Event event) {		
-			}
+        	@Override
+        	public void handle(javafx.event.Event event) {
+			
+        		}
         });
-        TimeSpinner startSpinner = new TimeSpinner();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm:ss");
+        
+        TextField startTimeField = new TextField();
+        startTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
+        
 
         DatePicker endDatePicker = new DatePicker();
         endDatePicker.setPromptText("enter end date and time");
         endDatePicker.setOnAction(new EventHandler() {
-			@Override
-			public void handle(javafx.event.Event event) {			
-			}
+        	@Override
+        		public void handle(javafx.event.Event event) {
+        		}
         });
-        TimeSpinner endSpinner = new TimeSpinner();
+        TextField endTimeField = new TextField();
+        endTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
 
         TextField textTags = new TextField();
         textTags.setPromptText("enter tag(s), separated by commas");
  
         TextField detailText = new TextField();
         detailText.setPromptText("enter description");
-
         
         Button btnAdd = new Button();
         btnAdd.setText("Add event");
  
+        Stage stage = new Stage();
+
         btnAdd.setOnAction(new EventHandler<ActionEvent>() {
- 
             @Override
             public void handle(ActionEvent event) {
-            	String name = nameField.getText();
-            	LocalDateTime start = startDatePicker.getValue().atTime(startSpinner.getValue());
-            	LocalDateTime end = endDatePicker.getValue().atTime(endSpinner.getValue());
-            	List<String> tags = Arrays.asList(textTags.getText().split(","));
-            	String details = detailText.getText();
-            	
-            	Planner.addEvent(name, start, end, tags, details);
-            	
-            	stage.close(); // return to main window
+            	boolean inputValid = true;
+	            String name = nameField.getText();
+
+	            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+	            
+	            String startTimeText = startTimeField.getText();
+	            // convert e.g. 1:23 to 01:23
+	            if(startTimeText.length() == 4 && startTimeText.charAt(1) == ':') {
+	            	startTimeText = "0"+startTimeText;
+	            }
+	            
+	            LocalDateTime start = null;
+	            LocalDate startDate = startDatePicker.getValue();
+	            
+	            // input validation: in case start date is empty
+	            if(startDate == null) {
+	            	inputValid = false;
+	            	startDatePicker.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            else {
+	            	startDatePicker.setStyle("-fx-background-color: white");
+	            }
+	            
+	            // input validation: in case startTime parsing throws exception
+	            try {
+	            	LocalTime startTime = LocalTime.parse(startTimeText, formatter);
+	            	if(startDate != null) {
+	            		start = startDate.atTime(startTime);	            	
+	            	}
+	            	startTimeField.setStyle("-fx-background-color: white"); // only happens if no exception!
+	            }
+	            catch(DateTimeParseException e) {
+	            	inputValid = false;
+	            	startTimeField.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            
+	            String endTimeText = endTimeField.getText();
+	            if(endTimeText.length() == 4 && endTimeText.charAt(1) == ':') {
+	            	endTimeText = "0"+endTimeText;
+	            }
+	            
+	            LocalDateTime end = null;
+	            LocalDate endDate = endDatePicker.getValue();
+	            
+	            // input validation: in case end date is empty
+	            if(endDate == null) {
+	            	inputValid = false;
+	            	endDatePicker.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            
+	            // input validation: in case endTime parsing throws exception
+	            try {
+		            LocalTime endTime = LocalTime.parse(endTimeText, formatter);
+		            if(endDate != null) {
+		            	end = endDate.atTime(endTime);
+		            }
+	            	endTimeField.setStyle("-fx-background-color: white");
+
+	            }
+	            catch(DateTimeParseException e) {
+	            	inputValid = false;
+	            	endTimeField.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            
+	            List<String> tags = Arrays.asList(textTags.getText().split(",")); //@TODO: Sanitize input
+	            String details = detailText.getText();
+	            
+	            // input validation: in case event does not have name
+	            if(name.equals("")) {
+	            	inputValid = false;
+	            	nameField.setStyle("-fx-background-color: #fc9e9d");
+	            }
+	            else {
+	            	nameField.setStyle("-fx-background-color: white");
+	            }
+	            
+	            for(int i = 0; i < tags.size(); i++) {
+	            	String tag = tags.get(i);
+	            	if(tag.charAt(0) == ' '){
+	            		tag = tag.substring(1);
+	            	}
+	            	if(tag.charAt(tag.length() - 1) == ' ') {
+	            		tag = tag.substring(0, tag.length()-1);
+	            	}
+	            	tags.set(i, tag);
+	            }
+	            
+	            if(inputValid) {
+	            	Planner.addEvent(name, start, end, tags, details);
+	            	
+	            	// Reset calendarListView
+	            	calendarListView.getItems().clear();
+	            	for (Event calendarItem:events){
+	            		calendarListView.getItems().add(calendarItem.toString());           
+	            	}
+	            	stage.close(); // return to main window	            	
+	            }
             }
         });
- 
-        box.getChildren().add(label);
-        box.getChildren().add(nameField);
-        box.getChildren().add(startDatePicker);
-        box.getChildren().add(startSpinner);
-        box.getChildren().add(endDatePicker);
-        box.getChildren().add(endSpinner);
-        box.getChildren().add(textTags);
-        box.getChildren().add(detailText);
-        box.getChildren().add(btnAdd);
+        VBox box = new VBox();
+        Label label = new Label("New event:");
+        box.getChildren().addAll(
+            label, 
+            nameField, 
+            startDatePicker, 
+            startTimeField,
+            endDatePicker, 
+            endTimeField, 
+            textTags, 
+            detailText, 
+            btnAdd);
         Scene scene = new Scene(box, 250, 500);
         stage.setScene(scene);
-        stage.show();    	
+        stage.show();
     }
      
     @Override
