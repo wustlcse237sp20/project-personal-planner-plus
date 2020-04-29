@@ -299,6 +299,17 @@ public class PlannerGUI extends Application
 	            	nameField.setStyle("-fx-background-color: white");
 	            }
 	            
+	            for(int i = 0; i < tags.size(); i++) {
+	            	String tag = tags.get(i);
+	            	if(tag.charAt(0) == ' '){
+	            		tag = tag.substring(1);
+	            	}
+	            	if(tag.charAt(tag.length() - 1) == ' ') {
+	            		tag = tag.substring(0, tag.length()-1);
+	            	}
+	            	tags.set(i, tag);
+	            }
+	            
 	            if(inputValid) {
 	            	Planner.addEvent(name, start, end, tags, details);
 	            	
