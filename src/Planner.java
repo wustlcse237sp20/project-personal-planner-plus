@@ -99,7 +99,7 @@ public class Planner
     }
 
     public static List<Event> getFilteredEvents(String filter) {
-        if (filter == "all"){
+        if (filter.equals("all")){
             return events;
         }
         List<Event> filtered = new ArrayList<Event>();

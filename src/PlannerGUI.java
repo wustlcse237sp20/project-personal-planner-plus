@@ -1,7 +1,9 @@
 package src;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,6 +34,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Iterator;
 
 public class PlannerGUI extends Application
 {
@@ -41,6 +44,8 @@ public class PlannerGUI extends Application
     private int calendarItem_lastChange =-1;
     private final String baseDetailMode = "Detail Mode ";
     private final Rectangle2D screenSize = Screen.getPrimary().getBounds();
+    private ComboBox tagBox;
+    private ListView calendarListView;
 
     public static void main(String[] args) {
         launch(args);
@@ -55,7 +60,7 @@ public class PlannerGUI extends Application
         Label calendarItemDetails = new Label(baseDetailMode + "OFF");
 
         // Setup list of events
-        ListView calendarListView = createCalendarListView();
+        calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
 
         // Setup two listeners on the calendarItems: the first fires on any change e.g. the arrow keys; the second for the double-click; both are needed
@@ -77,7 +82,7 @@ public class PlannerGUI extends Application
         // Create add button 
         Button newItemBtn = new Button();
         newItemBtn.setText("New Event");
-        newItemBtn.setMinWidth(screenSize.getWidth() / 3.0); // button max 1/3 width
+        newItemBtn.setMinWidth(screenSize.getWidth() / 6.0); // button max 1/3 width
         newItemBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -85,17 +90,25 @@ public class PlannerGUI extends Application
             }
         });
 
-        ComboBox tagBox = new ComboBox();
+        tagBox = new ComboBox();
         tagBox.getItems().add("all");
+        tagBox.setMinWidth(screenSize.getWidth() / 6.0);
         for (String tag : Planner.getTagSet()){
             tagBox.getItems().add(tag);
         }
+        tagBox.setValue("all");
+        tagBox.setVisibleRowCount(5);
+        tagBox.valueProperty().addListener(new ChangeListener<String>(){
+            @Override public void changed(ObservableValue ov, String t, String t1) {
+            reloadEvents(t1);
+        }
+        });
 
         // Create hBox for the top row
         HBox firstRow = new HBox();
         firstRow.setPadding(new Insets(10, 10, 10, 10)); // padding of hbox
         firstRow.setSpacing(10); // space between children
-        firstRow.getChildren().addAll(searchBar, newItemBtn);
+        firstRow.getChildren().addAll(searchBar, newItemBtn, tagBox);
 
         // Create layout, add items to it
         BorderPane layout = new BorderPane();
@@ -119,6 +132,7 @@ public class PlannerGUI extends Application
                         break;
                     case ENTER:
                     	searchCalendar(searchBar.getText(), calendarListView);
+                        tagBox.setValue("all");
                     break;
                 }
             }
@@ -131,7 +145,15 @@ public class PlannerGUI extends Application
     public void loadEvents(){
         Planner.initializeVars();
         Planner.loadData();
-        events = Planner.getEvents();
+        events = Planner.getFilteredEvents("all");
+    }
+
+    public void reloadEvents(String filter){
+        events = Planner.getFilteredEvents(filter);
+        calendarListView.getItems().clear();
+        for (Event calendarItem:events){
+            calendarListView.getItems().add(calendarItem.toString());           
+        }
     }
 
     private ListView createCalendarListView(){
@@ -311,8 +333,8 @@ public class PlannerGUI extends Application
 	            }
 	            
 	            List<String> tags = Arrays.asList(textTags.getText().split(",")); //@TODO: Sanitize input
+                List<String> validTags = new ArrayList();
 	            String details = detailText.getText();
-	            
 	            // input validation: in case event does not have name
 	            if(name.equals("")) {
 	            	inputValid = false;
@@ -321,26 +343,44 @@ public class PlannerGUI extends Application
 	            else {
 	            	nameField.setStyle("-fx-background-color: white");
 	            }
-	            
 	            for(int i = 0; i < tags.size(); i++) {
-	            	String tag = tags.get(i);
+                    String tag = tags.get(i);
+                    if(tag.length() > 0 && !tag.equals("all")){
+                        validTags.add(tag);
+                    }
+                }
+	            for(int i = 0; i < validTags.size(); i++) {
+	            	String tag = validTags.get(i);
 	            	if(tag.charAt(0) == ' '){
-	            		tag = tag.substring(1);
-	            	}
-	            	if(tag.charAt(tag.length() - 1) == ' ') {
-	            		tag = tag.substring(0, tag.length()-1);
-	            	}
-	            	tags.set(i, tag);
+                		tag = tag.substring(1);
+    	         	}
+    	        	if(tag.charAt(tag.length() - 1) == ' ') {
+    	        		tag = tag.substring(0, tag.length()-1);
+    	           	}
+    	            validTags.set(i, tag);
 	            }
-	            
+	            Iterator<String> itr = validTags.iterator();
+                while (itr.hasNext()) {
+                    String tag = itr.next();
+                    if (tag.equals("all")) {
+                        itr.remove();
+                    }
+                }
 	            if(inputValid) {
-	            	Planner.addEvent(name, start, end, tags, details);
+	            	Planner.addEvent(name, start, end, validTags, details);
 	            	
 	            	// Reset calendarListView
 	            	calendarListView.getItems().clear();
 	            	for (Event calendarItem:events){
 	            		calendarListView.getItems().add(calendarItem.toString());           
 	            	}
+
+                    tagBox.getItems().clear();
+                    tagBox.getItems().add("all");
+                    for (String tag : Planner.getTagSet()){
+                        tagBox.getItems().add(tag);
+                    }
+                    tagBox.setValue("all");
 	            	stage.close(); // return to main window	            	
 	            }
             }
