@@ -199,7 +199,7 @@ public class PlannerGUI extends Application {
 
     // Adapted from:
     // quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
-    private void showAddEvent() {
+    private void showAddEvent(ListView calendarListView) {
 
         TextField nameField = new TextField();
         nameField.setPromptText("enter event name");
@@ -244,6 +244,12 @@ public class PlannerGUI extends Application {
                 String details = detailText.getText();
 
                 Planner.addEvent(name, start, end, tags, details);
+
+                // Reset calendarListView
+                calendarListView.getItems().clear();
+	            	for (Event calendarItem:events){
+                    calendarListView.getItems().add(calendarItem.toString());           
+                }
 
                 stage.close(); // return to main window
             }
