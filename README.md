@@ -18,8 +18,6 @@ To Run:
     - Note: On Mac, you may receive [an error message](./Resources/Error_Message.png), which can be disregarded
 
 ## Instructions
-- Events can be added by pressing the "a" key
-    - (Note: the display does not currently refresh after adding an event; to see an event after it's been added, exit and re-run the program.)
 - Events are deleted by selecting and pressing backspace
 
 ## What user stories were completed this iteration?

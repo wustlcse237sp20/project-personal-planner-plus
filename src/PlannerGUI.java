@@ -46,7 +46,8 @@ public class PlannerGUI extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception
+    {
         loadEvents();
 
         // Create details label
@@ -105,22 +106,14 @@ public class PlannerGUI extends Application {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
-                case BACK_SPACE:
-                    int currIndex = calendarListView.getSelectionModel().selectedIndexProperty().getValue();
-                    if (currIndex > -1) {
-                        calendarListView.getItems().remove(currIndex);
-                        events.remove(currIndex);
-                        showCalendarItemDetailsChange(Math.max(currIndex - 1, 0), calendarItemDetails,
-                                calendarListView);
-                    }
-                    break;
-                case A:
-                    if ("".equals(searchBar.getText())) { // @TODO: This if is a temp fix; pressing 'A' in the search
-                                                          // box adds event
-                        //     showAddEvent(calendarListView);
-                    } else {
-                        System.out.println("errant a press");
-                    }
+                    case BACK_SPACE:  
+                        int currIndex = calendarListView.getSelectionModel().selectedIndexProperty().getValue();
+                        if(currIndex > -1){
+                            calendarListView.getItems().remove(currIndex);
+                            events.remove(currIndex);
+                            showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
+                            System.out.println("del");
+                        }
                     break;
                 }
             }
@@ -130,15 +123,15 @@ public class PlannerGUI extends Application {
         showLayout(primaryStage, scene);
     }
 
-    public void loadEvents() {
+    public void loadEvents(){
         Planner.initializeVars();
         Planner.loadData();
         events = Planner.getEvents();
     }
 
-    private ListView createCalendarListView() {
+    private ListView createCalendarListView(){
         ListView calendarListView = new ListView();
-        for (Event event : events) {
+        for (Event event:events){
             calendarListView.getItems().add(event.toString());
         }
         return calendarListView;
@@ -152,7 +145,7 @@ public class PlannerGUI extends Application {
         return calendarScrollPane;
     }
 
-    private void showLayout(Stage primaryStage, Scene scene) {
+    private void showLayout(Stage primaryStage, Scene scene){
         primaryStage.setTitle("Personal Planner +");
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
@@ -247,7 +240,7 @@ public class PlannerGUI extends Application {
                 String name = nameField.getText();
                 LocalDateTime start = startDatePicker.getValue().atTime(startSpinner.getValue());
                 LocalDateTime end = endDatePicker.getValue().atTime(endSpinner.getValue());
-                List<String> tags = Arrays.asList(textTags.getText().split(",")); // @TODO: Sanitize input
+                List<String> tags = Arrays.asList(textTags.getText().split(","));
                 String details = detailText.getText();
 
                 Planner.addEvent(name, start, end, tags, details);
@@ -265,7 +258,7 @@ public class PlannerGUI extends Application {
     }
 
     @Override
-    public void stop() {
+    public void stop(){
         Planner.setEvents(events);
         Planner.writeData();
     }
