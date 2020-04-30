@@ -185,7 +185,7 @@ public class PlannerGUI extends Application
     private void showCalendarItemDetailsChange(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
         if(calendarIndex_Change >= 0) {
             Event clickedEvent = events.get(calendarIndex_Change);
-            calendarItemDetails.setText(clickedEvent.getDetails());
+            calendarItemDetails.setText(clickedEvent.getDetailsString());
             calendarItem_lastChange = calendarIndex_Change;
             showDetails = true;
             freezeCursor = true;
@@ -197,7 +197,7 @@ public class PlannerGUI extends Application
             showDetails = !showDetails;
             if(showDetails){
                 Event clickedEvent = events.get(calendarIndexClick);
-                calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
+                calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetailsString());
             }
             else{
                 calendarListView.getSelectionModel().clearSelection();
