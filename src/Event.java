@@ -87,7 +87,8 @@ public class Event implements Comparable, Serializable{
 
 //    for debugging purposes
     public String allFields() {
-        return new String(this.name + "\n"
+        return new String(
+                this.name + "\n"
         		+ this.startDate + "\n"
         		+ this.endDate + "\n"
         		+ this.tags

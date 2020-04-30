@@ -52,9 +52,9 @@ public class PlannerGUI extends Application
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception 
+    public void start(Stage primaryStage) throws Exception
     {
-        loadEvents();     
+        loadEvents();
 
         // Create details label
         Label calendarItemDetails = new Label(baseDetailMode + "OFF");
@@ -67,19 +67,22 @@ public class PlannerGUI extends Application
         calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
         @Override
             public void invalidated(Observable observable) {
-                showCalendarItemDetailsChange(((ReadOnlyIntegerProperty)observable).getValue(), calendarItemDetails, calendarListView);
+                showCalendarItemDetailsChange(((ReadOnlyIntegerProperty) observable).getValue(), calendarItemDetails,
+                        calendarListView);
             }
         });
-        calendarListView.setOnMouseClicked(
-            EventObject -> showCalendarItemDetailsClick( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView)
-        );
+        calendarListView.setOnMouseClicked(EventObject -> showCalendarItemDetailsClick(
+                ((IndexedCell) (EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView));
 
-         // Create search tool
+        // Create search tool and listener
         TextField searchBar = new TextField();
         searchBar.setPromptText("Search Query...");
         searchBar.setMinWidth(screenSize.getWidth() * 2 / 3.0); // search max 2/3 width
+        searchBar.textProperty().addListener((observable, oldQuery, newQuery) -> {
+            searchCalendar(searchBar.getText(), calendarListView);
+        });
 
-        // Create add button 
+        // Create add button and listener
         Button newItemBtn = new Button();
         newItemBtn.setText("New Event");
         newItemBtn.setMinWidth(screenSize.getWidth() / 6.0); // button max 1/3 width
@@ -152,7 +155,7 @@ public class PlannerGUI extends Application
         events = Planner.getFilteredEvents(filter);
         calendarListView.getItems().clear();
         for (Event calendarItem:events){
-            calendarListView.getItems().add(calendarItem.toString());           
+            calendarListView.getItems().add(calendarItem.toString());
         }
     }
 
@@ -206,21 +209,21 @@ public class PlannerGUI extends Application
         }
     }
 
-    private void searchCalendar(String query, ListView calendarListView){
+    private void searchCalendar(String query, ListView calendarListView) {
         // Reset calendarListView
         calendarListView.getItems().clear();
-        for (Event event:events){
-            calendarListView.getItems().add(event.toString());           
+        for (Event event : events) {
+            calendarListView.getItems().add(event.toString());
         }
 
         // Execute search
         int index = 0;
-        for (Event event:events){
-            if(! event.toString().contains(query)){
+        for (Event event : events) {
+            if (!event.toString().contains(query)) {
                 System.out.println("Removal at: " + index);
                 calendarListView.getItems().remove(index);
-            } 
-            index++;          
+            }
+            index++;
         }
     }
 

@@ -1,6 +1,6 @@
 # Personal-Planner-Plus
 
-A Java-based personal planner that allows its user to manage their tasks and deadlines
+A Java-based personal planner that allows users to manage their tasks and deadlines
 
 For more information, please refer to the [Project Pitch](https://docs.google.com/presentation/d/1Cowe3ziwn9F5T3Z5tuv8b_cD5_qyVIpTpGVDr7sPgRk/edit#slide=id.gd814cf7d3_0_5)
 
@@ -17,7 +17,8 @@ To Run:
     - ```java -cp bin src.PlannerGUI```
     - Note: On Mac, you may receive [an error message](./Resources/Error_Message.png), which can be disregarded
 
-Events can be added by pressing the "a" key and deleted by selecting and pressing backspace. (Note: the display does not currently refresh after adding an event; to see an event after it's been added, exit and re-run the program.
+## Instructions
+- Events are deleted by selecting and pressing backspace
 
 ## What user stories were completed this iteration?
 - Ability to view Event Details
