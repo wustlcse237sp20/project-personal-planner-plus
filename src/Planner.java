@@ -115,6 +115,10 @@ public class Planner
         return filtered;
     }
 
+    public static void setEvent(int index, Event replacementEvent) {
+    	events.set(index, replacementEvent);
+    }
+    
     public static void setEvents(List<Event> newEvents){
         events = newEvents;
     }

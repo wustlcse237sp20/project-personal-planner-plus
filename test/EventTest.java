@@ -17,11 +17,11 @@ public class EventTest
 
         assertTrue("event1 not < event2 when event1 start time precedes event2 start time", event1.compareTo(event2) < 0);
 
-        event2.setStartDate(event1.getStartDate());
-        event2.setEndDate(event1.getEndDate().minusMinutes(5));
+        event2.setStartDate(event1.getStartDateTime());
+        event2.setEndDate(event1.getEndDateTime().minusMinutes(5));
         assertTrue("event2 not < event1 when start times equal, event2 end time precedes event1 end time", event2.compareTo(event1) < 0);
 
-        event2.setEndDate(event1.getEndDate());
+        event2.setEndDate(event1.getEndDateTime());
         assertTrue("event1 not < event2 when start, end times equal", event1.compareTo(event2) < 0);
 
         event2.setName("event 1");

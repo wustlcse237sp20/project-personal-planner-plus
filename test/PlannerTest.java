@@ -32,8 +32,8 @@ public class PlannerTest
 		Event event = Planner.getEvents().get(0);
 		
 		assertTrue("Event name was added wrong", event.getName().equals(eventName));
-		assertTrue("Event startDate was added wrong", event.getStartDate().equals(startDate));
-		assertTrue("Event endDate was added wrong", event.getEndDate().equals(endDate));
+		assertTrue("Event startDate was added wrong", event.getStartDateTime().equals(startDate));
+		assertTrue("Event endDate was added wrong", event.getEndDateTime().equals(endDate));
 		assertTrue("Event tags were added wrong", event.getTags().equals(tags));
 		assertTrue("Event details were added wrong", event.getDetails().equals(details));		
 	}
