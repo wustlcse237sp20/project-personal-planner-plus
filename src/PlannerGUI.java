@@ -47,6 +47,7 @@ public class PlannerGUI extends Application
     private final Rectangle2D screenSize = Screen.getPrimary().getBounds();
     private ComboBox tagBox;
     private ListView calendarListView;
+    private Label calendarItemDetails;
 
     public static void main(String[] args) {
         launch(args);
@@ -58,7 +59,7 @@ public class PlannerGUI extends Application
         loadEvents();
 
         // Create details label
-        Label calendarItemDetails = new Label(baseDetailMode + "OFF");
+        calendarItemDetails = new Label(baseDetailMode + "OFF");
 
         // Setup list of events
         calendarListView = createCalendarListView();
@@ -149,7 +150,7 @@ public class PlannerGUI extends Application
                         if(currIndex > -1){
                             calendarListView.getItems().remove(currIndex);
                             events.remove(currIndex);
-                            calendarItemDetailChanged(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
+                            calendarItemDetails.setText(baseDetailMode +  "OFF");
                         }
                         break;
                 }
@@ -413,7 +414,8 @@ public class PlannerGUI extends Application
                         tagBox.getItems().add(tag);
                     }
                     tagBox.setValue("all");
-	            	stage.close(); // return to main window	            	
+	            	stage.close(); // return to main window
+                    calendarItemDetails.setText(baseDetailMode +  "OFF");        	
 	            }
             }
         });
@@ -633,7 +635,8 @@ public class PlannerGUI extends Application
     						tagBox.getItems().add(tag);
     					}
     					tagBox.setValue("all");
-    					stage.close(); // return to main window	            	
+    					stage.close(); // return to main window	   
+                        calendarItemDetails.setText(baseDetailMode +  "OFF");         	
     				}
     			}
     		});
