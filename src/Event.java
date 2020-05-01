@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.StringBuilder;
 
 public class Event implements Comparable, Serializable {
     private static final long serialVersionUID = 4L;
@@ -69,20 +70,48 @@ public class Event implements Comparable, Serializable {
         this.details = details;
     }
 
-    public String toString() {
+    public String formatDate(LocalDateTime dateTime){
         int currentYear = LocalDateTime.now().getYear();
         DateTimeFormatter formatter;
-        if (this.startDate.getYear() / 1000 != currentYear / 1000) // not in current millenium
+        if(dateTime.getYear()/1000 != currentYear/1000) // not in current millenium
         {
-            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        } else if (this.startDate.getYear() != currentYear) // not in current yr, but in same millenium
-        {
-            formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
-        } else // in current yr
-        {
-            formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         }
-        return startDate.format(formatter) + "\t" + name;
+        else if(dateTime.getYear() != currentYear) // not in current yr, but in same millenium
+        {
+            formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+        }
+        else // in current yr
+        {
+            formatter = DateTimeFormatter.ofPattern("dd/MM");
+        }
+        return dateTime.format(formatter);
+    }
+
+    public String formatTime(LocalDateTime dateTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return dateTime.format(formatter);
+    }
+
+    public String toString(){
+        return formatDate(startDate) + " " + formatTime(startDate) + "\t" + name;
+    }
+
+    public String getDetailsString(){
+        String startDateString = formatDate(startDate);
+        String endDateString = formatDate(endDate);
+        StringBuilder detailsString = new StringBuilder(name + "\n");
+        if (startDateString.equals(endDateString)){
+             detailsString.append(startDateString + "\t" + formatTime(startDate) + " - " + formatTime(endDate) + "\n" + "Tags:\t");
+        }
+        else{
+            detailsString.append(startDateString +" "+ formatTime(startDate) + " - "+endDateString +" "+ formatTime(endDate) + "\n" + "Tags:\t");
+        }
+        for (String tag : tags){
+            detailsString.append(tag + ", ");
+        }
+        detailsString.append("\n"+details);
+        return detailsString.toString();
     }
 
     // for debugging purposes
