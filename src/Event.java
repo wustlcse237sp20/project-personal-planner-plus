@@ -10,8 +10,8 @@ import java.lang.StringBuilder;
 public class Event implements Comparable, Serializable {
     private static final long serialVersionUID = 4L;
     private String name;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
     private List<String> tags;
     private String details;
     private int id;
@@ -19,8 +19,8 @@ public class Event implements Comparable, Serializable {
     public Event(String name, LocalDateTime startDate, LocalDateTime endDate, List<String> tags, String details,
             int id) {
         this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateTime = startDate;
+        this.endDateTime = endDate;
         this.tags = tags;
         this.details = details;
         this.id = id;
@@ -30,12 +30,12 @@ public class Event implements Comparable, Serializable {
         return this.name;
     }
 
-    public LocalDateTime getStartDate() {
-        return this.startDate;
+    public LocalDateTime getStartDateTime() {
+        return this.startDateTime;
     }
 
-    public LocalDateTime getEndDate() {
-        return this.endDate;
+    public LocalDateTime getEndDateTime() {
+        return this.endDateTime;
     }
 
     public List<String> getTags() {
@@ -55,11 +55,11 @@ public class Event implements Comparable, Serializable {
     }
 
     public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
+        this.startDateTime = startDate;
     }
 
     public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+        this.endDateTime = endDate;
     }
 
     public void addTag(String tag) {
@@ -75,15 +75,15 @@ public class Event implements Comparable, Serializable {
         DateTimeFormatter formatter;
         if(dateTime.getYear()/1000 != currentYear/1000) // not in current millenium
         {
-            formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         }
         else if(dateTime.getYear() != currentYear) // not in current yr, but in same millenium
         {
-            formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+            formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
         }
         else // in current yr
         {
-            formatter = DateTimeFormatter.ofPattern("dd/MM");
+            formatter = DateTimeFormatter.ofPattern("MM/dd");
         }
         return dateTime.format(formatter);
     }
@@ -94,18 +94,18 @@ public class Event implements Comparable, Serializable {
     }
 
     public String toString(){
-        return formatDate(startDate) + " " + formatTime(startDate) + "\t" + name;
+        return formatDate(startDateTime) + " " + formatTime(startDateTime) + "\t" + name;
     }
 
     public String getDetailsString(){
-        String startDateString = formatDate(startDate);
-        String endDateString = formatDate(endDate);
+        String startDateString = formatDate(startDateTime);
+        String endDateString = formatDate(endDateTime);
         StringBuilder detailsString = new StringBuilder(name + "\n");
         if (startDateString.equals(endDateString)){
-             detailsString.append(startDateString + "\t" + formatTime(startDate) + " - " + formatTime(endDate) + "\n" + "Tags:\t");
+             detailsString.append(startDateString + "\t" + formatTime(startDateTime) + " - " + formatTime(endDateTime) + "\n" + "Tags:\t");
         }
         else{
-            detailsString.append(startDateString +" "+ formatTime(startDate) + " - "+endDateString +" "+ formatTime(endDate) + "\n" + "Tags:\t");
+            detailsString.append(startDateString +" "+ formatTime(startDateTime) + " - "+endDateString +" "+ formatTime(endDateTime) + "\n" + "Tags:\t");
         }
         for (String tag : tags){
             detailsString.append(tag + ", ");
@@ -118,8 +118,8 @@ public class Event implements Comparable, Serializable {
     public String allFields() {
         return new String(
             this.name + "\n" +
-            this.startDate + "\n" + 
-            this.endDate + "\n" +
+            this.startDateTime + "\n" + 
+            this.endDateTime + "\n" +
             this.tags + "\n" +
             this.details + "\n" +
             this.id);
@@ -129,9 +129,9 @@ public class Event implements Comparable, Serializable {
     public int compareTo(Object o) {
         Event otherEvent = (Event) o;
         // earlier start date < later start date
-        int startDateComp = this.startDate.compareTo(otherEvent.startDate);
+        int startDateComp = this.startDateTime.compareTo(otherEvent.startDateTime);
         if (startDateComp == 0) {
-            int endDateComp = this.endDate.compareTo(otherEvent.endDate);
+            int endDateComp = this.endDateTime.compareTo(otherEvent.endDateTime);
             if (endDateComp == 0) {
                 return this.name.compareTo(otherEvent.name);
             }
@@ -151,11 +151,11 @@ public class Event implements Comparable, Serializable {
         if (!this.name.equals(otherEvent.name)) {
             System.out.println("this.name (" + this.name + ") != otherEvent.name (" + otherEvent.name + ")");
         }
-        if (!this.startDate.equals(otherEvent.startDate)) {
-            System.out.println("this.startDate (" + this.startDate + ") != otherEvent.startDate (" + otherEvent.startDate + ")");
+        if (!this.startDateTime.equals(otherEvent.startDateTime)) {
+            System.out.println("this.startDate (" + this.startDateTime + ") != otherEvent.startDate (" + otherEvent.startDateTime + ")");
         }
-        if (!this.endDate.equals(otherEvent.endDate)) {
-            System.out.println("this.endDate (" + this.endDate + ") != otherEvent.endDate (" + otherEvent.endDate + ")");
+        if (!this.endDateTime.equals(otherEvent.endDateTime)) {
+            System.out.println("this.endDate (" + this.endDateTime + ") != otherEvent.endDate (" + otherEvent.endDateTime + ")");
         }
         if (!this.tags.equals(otherEvent.tags)) {
             System.out.println("this.tags (" + this.tags + ") != otherEvent.tags (" + otherEvent.tags + ")");
@@ -168,8 +168,8 @@ public class Event implements Comparable, Serializable {
         }
 
         return this.name.equals(otherEvent.name) &&
-            this.startDate.equals(otherEvent.startDate) &&
-            this.endDate.equals(otherEvent.endDate) &&
+            this.startDateTime.equals(otherEvent.startDateTime) &&
+            this.endDateTime.equals(otherEvent.endDateTime) &&
             this.tags.equals(otherEvent.tags) &&
             this.details.equals(otherEvent.details) &&
             this.id == otherEvent.id;
