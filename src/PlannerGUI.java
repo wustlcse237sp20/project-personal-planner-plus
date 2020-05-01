@@ -1,11 +1,18 @@
 package src;
+
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
@@ -14,14 +21,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.geometry.Pos;
-import javafx.scene.layout.HBox;
-import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
-import javafx.geometry.Insets;
+import javafx.stage.Stage;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -30,53 +34,64 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class PlannerGUI extends Application
 {
     private List<Event> events;
-    private boolean showDetails = true;
-    private boolean freezeCursor = true;
+    private boolean showDetails = true, freezeCursor = true;
     private int calendarItem_lastChange =-1;
     private final String baseDetailMode = "Detail Mode ";
     private final Rectangle2D screenSize = Screen.getPrimary().getBounds();
+    private ComboBox tagBox;
+    private ListView calendarListView;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception 
+    public void start(Stage primaryStage) throws Exception
     {
-        loadEvents();     
+        loadEvents();
 
         // Create details label
         Label calendarItemDetails = new Label(baseDetailMode + "OFF");
 
         // Setup list of events
-        ListView calendarListView = createCalendarListView();
+        calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
 
         // Setup two listeners on the calendarItems: the first fires on any change e.g. the arrow keys; the second for the double-click; both are needed
         calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
         @Override
             public void invalidated(Observable observable) {
-                showCalendarItemDetailsChange(((ReadOnlyIntegerProperty)observable).getValue(), calendarItemDetails, calendarListView);
+                calendarItemDetailChanged(
+                        ((ReadOnlyIntegerProperty) observable).getValue(),
+                        calendarItemDetails,
+                        calendarListView);
             }
         });
-        calendarListView.setOnMouseClicked(
-            EventObject -> showCalendarItemDetailsClick( ((IndexedCell)(EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView)
-        );
+        calendarListView.setOnMouseClicked(EventObject ->
+            calendarItemDetailClick(
+                ((IndexedCell) (EventObject.getTarget())).getIndex(),
+                calendarItemDetails,
+                calendarListView));
 
-         // Create search tool
+        // Create search tool and listener
         TextField searchBar = new TextField();
         searchBar.setPromptText("Search Query...");
         searchBar.setMinWidth(screenSize.getWidth() * 2 / 3.0); // search max 2/3 width
+        searchBar.textProperty().addListener((observable, oldQuery, newQuery) -> {
+            tagBox.setValue("all");
+            searchCalendar(searchBar.getText(), calendarListView);
+        });
 
-        // Create add button 
+        // Create add button and listener
         Button newItemBtn = new Button();
         newItemBtn.setText("New Event");
-        newItemBtn.setMinWidth(screenSize.getWidth() / 3.0); // button max 1/3 width
+        newItemBtn.setMinWidth(screenSize.getWidth() / 6.0); // button max 1/3 width
         newItemBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -84,11 +99,26 @@ public class PlannerGUI extends Application
             }
         });
 
+        // Create tag box and listener
+        tagBox = new ComboBox();
+        tagBox.getItems().add("all");
+        tagBox.setMinWidth(screenSize.getWidth() / 6.0);
+        for (String tag : Planner.getTagSet()){
+            tagBox.getItems().add(tag);
+        }
+        tagBox.setValue("all");
+        tagBox.setVisibleRowCount(5);
+        tagBox.valueProperty().addListener(new ChangeListener<String>(){
+            @Override public void changed(ObservableValue ov, String t, String t1) {
+            reloadEvents(t1);
+        }
+        });
+
         // Create hBox for the top row
         HBox firstRow = new HBox();
         firstRow.setPadding(new Insets(10, 10, 10, 10)); // padding of hbox
         firstRow.setSpacing(10); // space between children
-        firstRow.getChildren().addAll(searchBar, newItemBtn);
+        firstRow.getChildren().addAll(searchBar, newItemBtn, tagBox);
 
         // Create layout, add items to it
         BorderPane layout = new BorderPane();
@@ -107,12 +137,9 @@ public class PlannerGUI extends Application
                         if(currIndex > -1){
                             calendarListView.getItems().remove(currIndex);
                             events.remove(currIndex);
-                            showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
+                            calendarItemDetailChanged(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
                         }
                         break;
-                    case ENTER:
-                    	searchCalendar(searchBar.getText(), calendarListView);
-                    break;
                 }
             }
         });
@@ -124,7 +151,15 @@ public class PlannerGUI extends Application
     public void loadEvents(){
         Planner.initializeVars();
         Planner.loadData();
-        events = Planner.getEvents();
+        events = Planner.getFilteredEvents("all");
+    }
+
+    public void reloadEvents(String filter){
+        events = Planner.getFilteredEvents(filter);
+        calendarListView.getItems().clear();
+        for (Event calendarItem:events){
+            calendarListView.getItems().add(calendarItem.toString());
+        }
     }
 
     private ListView createCalendarListView(){
@@ -150,22 +185,22 @@ public class PlannerGUI extends Application
         primaryStage.show();
     }
 
-    private void showCalendarItemDetailsChange(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
+    private void calendarItemDetailChanged(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
         if(calendarIndex_Change >= 0) {
             Event clickedEvent = events.get(calendarIndex_Change);
-            calendarItemDetails.setText(clickedEvent.getDetails());
+            calendarItemDetails.setText(clickedEvent.getDetailsString());
             calendarItem_lastChange = calendarIndex_Change;
             showDetails = true;
             freezeCursor = true;
         }
     }
 
-     private void showCalendarItemDetailsClick(int calendarIndexClick, Label calendarItemDetails, ListView calendarListView){
+     private void calendarItemDetailClick(int calendarIndexClick, Label calendarItemDetails, ListView calendarListView){
         if(calendarItem_lastChange  == calendarIndexClick && !freezeCursor){ 
             showDetails = !showDetails;
             if(showDetails){
                 Event clickedEvent = events.get(calendarIndexClick);
-                calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetails());
+                calendarItemDetails.setText(baseDetailMode+ "ON: " + clickedEvent.getDetailsString());
             }
             else{
                 calendarListView.getSelectionModel().clearSelection();
@@ -177,21 +212,21 @@ public class PlannerGUI extends Application
         }
     }
 
-    private void searchCalendar(String query, ListView calendarListView){
+    private void searchCalendar(String query, ListView calendarListView) {
         // Reset calendarListView
         calendarListView.getItems().clear();
-        for (Event event:events){
-            calendarListView.getItems().add(event.toString());           
+        for (Event event : events) {
+            calendarListView.getItems().add(event.toString());
         }
 
         // Execute search
         int index = 0;
-        for (Event event:events){
-            if(! event.toString().contains(query)){
+        for (Event event : events) {
+            if (!event.toString().contains(query)) {
                 System.out.println("Removal at: " + index);
                 calendarListView.getItems().remove(index);
-            } 
-            index++;          
+            }
+            index++;
         }
     }
 
@@ -213,7 +248,6 @@ public class PlannerGUI extends Application
         
         TextField startTimeField = new TextField();
         startTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
-        
 
         DatePicker endDatePicker = new DatePicker();
         endDatePicker.setPromptText("enter end date and time");
@@ -304,8 +338,8 @@ public class PlannerGUI extends Application
 	            }
 	            
 	            List<String> tags = Arrays.asList(textTags.getText().split(",")); //@TODO: Sanitize input
+                List<String> validTags = new ArrayList();
 	            String details = detailText.getText();
-	            
 	            // input validation: in case event does not have name
 	            if(name.equals("")) {
 	            	inputValid = false;
@@ -314,26 +348,44 @@ public class PlannerGUI extends Application
 	            else {
 	            	nameField.setStyle("-fx-background-color: white");
 	            }
-	            
 	            for(int i = 0; i < tags.size(); i++) {
-	            	String tag = tags.get(i);
+                    String tag = tags.get(i);
+                    if(tag.length() > 0 && !tag.equals("all")){
+                        validTags.add(tag);
+                    }
+                }
+	            for(int i = 0; i < validTags.size(); i++) {
+	            	String tag = validTags.get(i);
 	            	if(tag.charAt(0) == ' '){
-	            		tag = tag.substring(1);
-	            	}
-	            	if(tag.charAt(tag.length() - 1) == ' ') {
-	            		tag = tag.substring(0, tag.length()-1);
-	            	}
-	            	tags.set(i, tag);
+                		tag = tag.substring(1);
+    	         	}
+    	        	if(tag.charAt(tag.length() - 1) == ' ') {
+    	        		tag = tag.substring(0, tag.length()-1);
+    	           	}
+    	            validTags.set(i, tag);
 	            }
-	            
+	            Iterator<String> itr = validTags.iterator();
+                while (itr.hasNext()) {
+                    String tag = itr.next();
+                    if (tag.equals("all")) {
+                        itr.remove();
+                    }
+                }
 	            if(inputValid) {
-	            	Planner.addEvent(name, start, end, tags, details);
+	            	Planner.addEvent(name, start, end, validTags, details);
 	            	
 	            	// Reset calendarListView
 	            	calendarListView.getItems().clear();
 	            	for (Event calendarItem:events){
 	            		calendarListView.getItems().add(calendarItem.toString());           
 	            	}
+
+                    tagBox.getItems().clear();
+                    tagBox.getItems().add("all");
+                    for (String tag : Planner.getTagSet()){
+                        tagBox.getItems().add(tag);
+                    }
+                    tagBox.setValue("all");
 	            	stage.close(); // return to main window	            	
 	            }
             }
