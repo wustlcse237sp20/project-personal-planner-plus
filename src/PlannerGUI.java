@@ -83,7 +83,7 @@ public class PlannerGUI extends Application
         // Create search tool and listener
         TextField searchBar = new TextField();
         searchBar.setPromptText("Search Query...");
-        searchBar.setMinWidth(screenSize.getWidth() * 2 / 3.0); // search max 2/3 width
+        searchBar.setMinWidth(screenSize.getWidth() / 2.0-10); // search max 2/3 width
         searchBar.textProperty().addListener((observable, oldQuery, newQuery) -> {
             tagBox.setValue("all");
             searchCalendar(searchBar.getText(), calendarListView);
@@ -92,7 +92,7 @@ public class PlannerGUI extends Application
         // Create add button and listener
         Button newItemBtn = new Button();
         newItemBtn.setText("New Event");
-        newItemBtn.setMinWidth(screenSize.getWidth() / 6.0); // button max 1/3 width
+        newItemBtn.setMinWidth(screenSize.getWidth() / 6.0-15); // button max 1/3 width
         newItemBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -103,7 +103,7 @@ public class PlannerGUI extends Application
         // Create edit button and listener
         Button editItemBtn = new Button();
         editItemBtn.setText("Edit Event");
-        editItemBtn.setMinWidth(screenSize.getWidth() / 6.0); // button max 1/3 width
+        editItemBtn.setMinWidth(screenSize.getWidth() / 6.0-15); // button max 1/3 width
         editItemBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -114,7 +114,7 @@ public class PlannerGUI extends Application
         // Create tag box and listener
         tagBox = new ComboBox();
         tagBox.getItems().add("all");
-        tagBox.setMinWidth(screenSize.getWidth() / 6.0);
+        tagBox.setMinWidth(screenSize.getWidth() / 6.0 - 10);
         for (String tag : Planner.getTagSet()){
             tagBox.getItems().add(tag);
         }
