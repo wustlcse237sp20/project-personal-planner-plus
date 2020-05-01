@@ -1,10 +1,4 @@
 package src;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Planner
 {
@@ -26,8 +26,10 @@ public class Planner
     	nextId = 0;
     }
 
+    // Note: writeDatat() and loadData() adapted from:
+    // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
+
     public static void writeData(){
-        // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
         File eventFile = new File(DATA_FILE_NAME);
         if (eventFile.exists()){
             eventFile.delete();
@@ -52,20 +54,19 @@ public class Planner
     }
 
     public static void loadData(){
-        // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
         File eventFile = new File(DATA_FILE_NAME);
         if(eventFile.exists()){
             try
             {
-                    FileInputStream fileInput = new FileInputStream(eventFile);
-                    ObjectInputStream objectInput = new ObjectInputStream(fileInput);
+                FileInputStream fileInput = new FileInputStream(eventFile);
+                ObjectInputStream objectInput = new ObjectInputStream(fileInput);
 
-                    events = (ArrayList<Event>)objectInput.readObject(); // TODO: ask Prof about unchecked cast warning 
-                    tagSet = (Set<String>)objectInput.readObject();
-                    nextId = (Integer)objectInput.readObject();
+                events = (ArrayList<Event>)objectInput.readObject(); // TODO: ask Prof about unchecked cast warning 
+                tagSet = (Set<String>)objectInput.readObject();
+                nextId = (Integer)objectInput.readObject();
 
-                    objectInput.close();
-                    fileInput.close();
+                objectInput.close();
+                fileInput.close();
             }
             catch(FileNotFoundException e){
                 e.printStackTrace();

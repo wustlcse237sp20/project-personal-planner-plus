@@ -1,30 +1,31 @@
 package src;
+
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.Observable;
-import javafx.beans.value.ObservableValue;
 import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.geometry.Pos;
-import javafx.scene.layout.HBox;
-import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
-import javafx.geometry.Insets;
+import javafx.stage.Stage;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -33,14 +34,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 public class PlannerGUI extends Application
 {
     private List<Event> events;
-    private boolean showDetails = true;
-    private boolean freezeCursor = true;
+    private boolean showDetails = true, freezeCursor = true;
     private int calendarItem_lastChange =-1;
     private final String baseDetailMode = "Detail Mode ";
     private final Rectangle2D screenSize = Screen.getPrimary().getBounds();
@@ -67,18 +67,24 @@ public class PlannerGUI extends Application
         calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
         @Override
             public void invalidated(Observable observable) {
-                showCalendarItemDetailsChange(((ReadOnlyIntegerProperty) observable).getValue(), calendarItemDetails,
+                calendarItemDetailChanged(
+                        ((ReadOnlyIntegerProperty) observable).getValue(),
+                        calendarItemDetails,
                         calendarListView);
             }
         });
-        calendarListView.setOnMouseClicked(EventObject -> showCalendarItemDetailsClick(
-                ((IndexedCell) (EventObject.getTarget())).getIndex(), calendarItemDetails, calendarListView));
+        calendarListView.setOnMouseClicked(EventObject ->
+            calendarItemDetailClick(
+                ((IndexedCell) (EventObject.getTarget())).getIndex(),
+                calendarItemDetails,
+                calendarListView));
 
         // Create search tool and listener
         TextField searchBar = new TextField();
         searchBar.setPromptText("Search Query...");
         searchBar.setMinWidth(screenSize.getWidth() * 2 / 3.0); // search max 2/3 width
         searchBar.textProperty().addListener((observable, oldQuery, newQuery) -> {
+            tagBox.setValue("all");
             searchCalendar(searchBar.getText(), calendarListView);
         });
 
@@ -93,6 +99,7 @@ public class PlannerGUI extends Application
             }
         });
 
+        // Create tag box and listener
         tagBox = new ComboBox();
         tagBox.getItems().add("all");
         tagBox.setMinWidth(screenSize.getWidth() / 6.0);
@@ -130,13 +137,9 @@ public class PlannerGUI extends Application
                         if(currIndex > -1){
                             calendarListView.getItems().remove(currIndex);
                             events.remove(currIndex);
-                            showCalendarItemDetailsChange(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
+                            calendarItemDetailChanged(Math.max(currIndex -1, 0), calendarItemDetails, calendarListView);
                         }
                         break;
-                    case ENTER:
-                    	searchCalendar(searchBar.getText(), calendarListView);
-                        tagBox.setValue("all");
-                    break;
                 }
             }
         });
@@ -182,7 +185,7 @@ public class PlannerGUI extends Application
         primaryStage.show();
     }
 
-    private void showCalendarItemDetailsChange(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
+    private void calendarItemDetailChanged(int calendarIndex_Change, Label calendarItemDetails, ListView calendarListView){
         if(calendarIndex_Change >= 0) {
             Event clickedEvent = events.get(calendarIndex_Change);
             calendarItemDetails.setText(clickedEvent.getDetails());
@@ -192,7 +195,7 @@ public class PlannerGUI extends Application
         }
     }
 
-     private void showCalendarItemDetailsClick(int calendarIndexClick, Label calendarItemDetails, ListView calendarListView){
+     private void calendarItemDetailClick(int calendarIndexClick, Label calendarItemDetails, ListView calendarListView){
         if(calendarItem_lastChange  == calendarIndexClick && !freezeCursor){ 
             showDetails = !showDetails;
             if(showDetails){
@@ -245,7 +248,6 @@ public class PlannerGUI extends Application
         
         TextField startTimeField = new TextField();
         startTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
-        
 
         DatePicker endDatePicker = new DatePicker();
         endDatePicker.setPromptText("enter end date and time");
