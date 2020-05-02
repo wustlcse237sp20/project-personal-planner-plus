@@ -58,106 +58,27 @@ public class PlannerGUI extends Application
     {
         loadEvents();
 
-        // Create details label
         calendarItemDetails = new Label(baseDetailMode + "OFF");
 
-        // Setup list of events
         calendarListView = createCalendarListView();
         ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
 
-        // Setup two listeners on the calendarItems: the first fires on any change e.g. the arrow keys; the second for the double-click; both are needed
-        calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
-        @Override
-            public void invalidated(Observable observable) {
-                calendarItemDetailChanged(
-                        ((ReadOnlyIntegerProperty) observable).getValue(),
-                        calendarItemDetails,
-                        calendarListView);
-            }
-        });
-        calendarListView.setOnMouseClicked(EventObject ->
-            calendarItemDetailClick(
-                ((IndexedCell) (EventObject.getTarget())).getIndex(),
-                calendarItemDetails,
-                calendarListView));
+        createEventsListListeners();
 
-        // Create search tool and listener
-        TextField searchBar = new TextField();
-        searchBar.setPromptText("Search Query...");
-        searchBar.setMinWidth(screenSize.getWidth() / 2.0-10); // search max 2/3 width
-        searchBar.textProperty().addListener((observable, oldQuery, newQuery) -> {
-            tagBox.setValue("all");
-            searchCalendar(searchBar.getText(), calendarListView);
-        });
+        TextField searchBar = createSearchBar();
 
-        // Create add button and listener
-        Button newItemBtn = new Button();
-        newItemBtn.setText("New Event");
-        newItemBtn.setMinWidth(screenSize.getWidth() / 6.0-15); // button max 1/3 width
-        newItemBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                showAddEvent(calendarListView);
-            }
-        });
+        Button newItemBtn = createAddEventButton();
         
-        // Create edit button and listener
-        Button editItemBtn = new Button();
-        editItemBtn.setText("Edit Event");
-        editItemBtn.setMinWidth(screenSize.getWidth() / 6.0-15); // button max 1/3 width
-        editItemBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                showEditEvent(calendarListView);
-            }
-        });
+        Button editItemBtn = createEditEventButton();
 
-        // Create tag box and listener
-        tagBox = new ComboBox();
-        tagBox.getItems().add("all");
-        tagBox.setMinWidth(screenSize.getWidth() / 6.0 - 10);
-        for (String tag : Planner.getTagSet()){
-            tagBox.getItems().add(tag);
-        }
-        tagBox.setValue("all");
-        tagBox.setVisibleRowCount(5);
-        tagBox.valueProperty().addListener(new ChangeListener<String>(){
-            @Override public void changed(ObservableValue ov, String t, String t1) {
-            reloadEvents(t1);
-        }
-        });
+        ComboBox tagBox = createTagBox();
 
-        // Create hBox for the top row
-        HBox firstRow = new HBox();
-        firstRow.setPadding(new Insets(10, 10, 10, 10)); // padding of hbox
-        firstRow.setSpacing(10); // space between children
-        firstRow.getChildren().addAll(searchBar, newItemBtn, editItemBtn, tagBox);
+        HBox firstRow = createTopRow(searchBar, newItemBtn, editItemBtn, tagBox);
 
-        // Create layout, add items to it
-        BorderPane layout = new BorderPane();
-        layout.setTop(firstRow);  
-        layout.setCenter(calendarScrollPane);
-        layout.setBottom(calendarItemDetails);
+        BorderPane layout = createLayout(firstRow, calendarScrollPane);
 
-        // Create a scene object with listeners 
-        Scene scene = new Scene(layout);  
-          scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                switch (event.getCode()) {
-                    case BACK_SPACE:  
-                        int currIndex = calendarListView.getSelectionModel().selectedIndexProperty().getValue();
-                        if(currIndex > -1){
-                            calendarListView.getItems().remove(currIndex);
-                            events.remove(currIndex);
-                            calendarItemDetails.setText(baseDetailMode +  "OFF");
-                        }
-                        break;
-                }
-            }
-        });
+        Scene scene = createSceneWithListeners(layout);
 
-        // Display the layout
         showLayout(primaryStage, scene); 
     }
 
@@ -169,10 +90,8 @@ public class PlannerGUI extends Application
 
     public void reloadEvents(String filter){
         events = Planner.getFilteredEvents(filter);
-        calendarListView.getItems().clear();
-        for (Event calendarItem:events){
-            calendarListView.getItems().add(calendarItem.toString());
-        }
+        
+        resetCalendarListView();
     }
 
     private ListView createCalendarListView(){
@@ -189,6 +108,113 @@ public class PlannerGUI extends Application
         calendarScrollPane.fitToWidthProperty().set(true);
         calendarScrollPane.pannableProperty().set(true);
         return calendarScrollPane;
+    }
+
+    private void createEventsListListeners(){
+        calendarListView.getSelectionModel().selectedIndexProperty().addListener(new InvalidationListener() {
+        @Override
+            public void invalidated(Observable observable) {
+                calendarItemDetailChanged(
+                        ((ReadOnlyIntegerProperty) observable).getValue(),
+                        calendarItemDetails,
+                        calendarListView);
+            }
+        });
+        calendarListView.setOnMouseClicked(EventObject ->
+            calendarItemDetailClick(
+                ((IndexedCell) (EventObject.getTarget())).getIndex(),
+                calendarItemDetails,
+                calendarListView));
+    }
+
+    private TextField createSearchBar(){
+        TextField searchBar = new TextField();
+        searchBar.setPromptText("Search Query...");
+        searchBar.setMinWidth(screenSize.getWidth() / 2.0-10);
+        searchBar.textProperty().addListener((observable, oldQuery, newQuery) -> {
+            tagBox.setValue("all");
+            searchCalendar(searchBar.getText());
+        });
+        return searchBar;
+    }
+
+    private Button createAddEventButton(){
+        Button newItemBtn = new Button();
+        newItemBtn.setText("New Event");
+        newItemBtn.setMinWidth(screenSize.getWidth() / 6.0-15);
+        newItemBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showAddEvent(calendarListView);
+            }
+        });
+        return newItemBtn;
+    }
+
+    private Button createEditEventButton(){
+        Button editItemBtn = new Button();
+        editItemBtn.setText("Edit Event");
+        editItemBtn.setMinWidth(screenSize.getWidth() / 6.0-15);
+        editItemBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showEditEvent(calendarListView);
+            }
+        });
+        return editItemBtn;
+    }
+
+    private ComboBox createTagBox(){
+        tagBox = new ComboBox();
+        tagBox.getItems().add("all");
+        tagBox.setMinWidth(screenSize.getWidth() / 6.0 - 10);
+        for (String tag : Planner.getTagSet()){
+            tagBox.getItems().add(tag);
+        }
+        tagBox.setValue("all");
+        tagBox.setVisibleRowCount(5);
+        tagBox.valueProperty().addListener(new ChangeListener<String>(){
+            @Override public void changed(ObservableValue ov, String t, String t1) {
+            reloadEvents(t1);
+        }
+        });
+        return tagBox;
+    }
+
+    private HBox createTopRow(TextField searchBar, Button newItemBtn, Button editItemBtn, ComboBox tagBox){
+        HBox firstRow = new HBox();
+        firstRow.setPadding(new Insets(10, 10, 10, 10));
+        firstRow.setSpacing(10);
+        firstRow.getChildren().addAll(searchBar, newItemBtn, editItemBtn, tagBox);
+        return firstRow;
+    }
+
+    private BorderPane createLayout(HBox firstRow, ScrollPane calendarScrollPane){
+        BorderPane layout = new BorderPane();
+        layout.setTop(firstRow);  
+        layout.setCenter(calendarScrollPane);
+        layout.setBottom(calendarItemDetails);
+        return layout;
+    }
+
+    private Scene createSceneWithListeners(BorderPane layout){
+        Scene scene = new Scene(layout);  
+          scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                switch (event.getCode()) {
+                    case BACK_SPACE:  
+                        int currIndex = calendarListView.getSelectionModel().selectedIndexProperty().getValue();
+                        if(currIndex > -1){
+                            calendarListView.getItems().remove(currIndex);
+                            events.remove(currIndex);
+                            calendarItemDetails.setText(baseDetailMode +  "OFF");
+                        }
+                        break;
+                }
+            }
+        });
+        return scene;
     }
 
     private void showLayout(Stage primaryStage, Scene scene){
@@ -225,14 +251,19 @@ public class PlannerGUI extends Application
         }
     }
 
-    private void searchCalendar(String query, ListView calendarListView) {
-        // Reset calendarListView
+    private void searchCalendar(String query) {
+        resetCalendarListView();
+        executeSearch(query);
+    }
+
+    private void resetCalendarListView(){
         calendarListView.getItems().clear();
         for (Event event : events) {
             calendarListView.getItems().add(event.toString());
         }
+    }
 
-        // Execute search
+    private void executeSearch(String query){
         int index = 0;
         for (Event event : events) {
             if (!event.toString().contains(query)) {
@@ -270,7 +301,7 @@ public class PlannerGUI extends Application
         		}
         });
         TextField endTimeField = new TextField();
-        endTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
+        endTimeField.setPromptText("enter end time (\"hh:mm\", 24-hour clock)");
 
         TextField textTags = new TextField();
         textTags.setPromptText("enter tag(s), separated by commas");
@@ -402,11 +433,7 @@ public class PlannerGUI extends Application
 	            if(inputValid) {
 	            	Planner.addEvent(name, start, end, validTags, details);
 	            	
-	            	// Reset calendarListView
-	            	calendarListView.getItems().clear();
-	            	for (Event calendarItem:events){
-	            		calendarListView.getItems().add(calendarItem.toString());           
-	            	}
+	            	resetCalendarListView();
 
                     tagBox.getItems().clear();
                     tagBox.getItems().add("all");
@@ -623,11 +650,7 @@ public class PlannerGUI extends Application
     					Event replacementEvent = new Event(name, start, end, validTags, details, eventId);
     					Planner.setEvent(currIndex, replacementEvent);
     					
-    					// Reset calendarListView
-    					calendarListView.getItems().clear();
-    					for (Event calendarItem:events){
-    						calendarListView.getItems().add(calendarItem.toString());           
-    					}
+    					resetCalendarListView();
     					
     					tagBox.getItems().clear();
     					tagBox.getItems().add("all");
