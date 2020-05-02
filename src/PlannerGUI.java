@@ -294,7 +294,7 @@ public class PlannerGUI extends Application
         startTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
 
         DatePicker endDatePicker = createDatePicker("enter end date");
-        
+
         TextField endTimeField = new TextField();
         endTimeField.setPromptText("enter end time (\"hh:mm\", 24-hour clock)");
 
@@ -677,7 +677,7 @@ public class PlannerGUI extends Application
     	}
     }
 
-    createDatePicker(String message){
+    DatePicker createDatePicker(String message){
         DatePicker datePicker = new DatePicker();
         datePicker.setPromptText(message);
         datePicker.setOnAction(new EventHandler() {
