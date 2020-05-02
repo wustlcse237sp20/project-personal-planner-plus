@@ -116,7 +116,7 @@ public class Planner
         return filtered;
     }
 
-    public static void setEvent(int index, Event replacementEvent) {
+    public static void editEvent(int index, Event replacementEvent) {
     	events.set(index, replacementEvent);
     }
     
@@ -126,5 +126,9 @@ public class Planner
 
     public static Set<String> getTagSet() {
         return tagSet;
+    }
+    
+    public static void removeTag(String tag) {
+    	tagSet.remove(tag);
     }
 }

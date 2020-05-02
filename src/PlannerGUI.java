@@ -357,7 +357,7 @@ public class PlannerGUI extends Application
 	            catch(DateTimeParseException e) {
 	            	inputValid = false;
 	            	startTimeField.setStyle("-fx-background-color: #fc9e9d");
-                	error += "Error: Start date invalid\n";
+                	error += "Error: Start time invalid\n";
 	            }
 	            
 	            String endTimeText = endTimeField.getText();
@@ -372,7 +372,7 @@ public class PlannerGUI extends Application
 	            if(endDate == null) {
 	            	inputValid = false;
 	            	endDatePicker.setStyle("-fx-background-color: #fc9e9d");
-                	error += "Error: End date cannot be empty\n";
+                	error += "Error: End time cannot be empty\n";
 	            }
 	            else {
 					startDatePicker.setStyle("-fx-background-color: white");
@@ -390,7 +390,7 @@ public class PlannerGUI extends Application
 	            catch(DateTimeParseException e) {
 	            	inputValid = false;
 	            	endTimeField.setStyle("-fx-background-color: #fc9e9d");
-                	error += "Error: End date invalid\n";
+                	error += "Error: End time invalid\n";
 	            }
 	            
 	            List<String> tags = Arrays.asList(textTags.getText().split(","));
@@ -652,7 +652,7 @@ public class PlannerGUI extends Application
                     }
     				if(inputValid) {
     					Event replacementEvent = new Event(name, start, end, validTags, details, eventId);
-    					Planner.setEvent(currIndex, replacementEvent);
+    					Planner.editEvent(currIndex, replacementEvent);
     					
     					resetCalendarListView();
     					

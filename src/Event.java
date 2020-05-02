@@ -104,9 +104,10 @@ public class Event implements Comparable, Serializable {
         else{
             detailsString.append(startDateString + " " + formatTime(startDateTime) + " - " + endDateString + " " + formatTime(endDateTime) + "\n" + "Tags:\t");
         }
-        for (String tag : tags){
-            detailsString.append(tag + ", ");
+        for(int i = 0; i < tags.size() - 1; i++) {
+        	detailsString.append(tags.get(i) + ", ");
         }
+        detailsString.append(tags.get(tags.size() - 1));
         detailsString.append("\n" + details);
         return detailsString.toString();
     }
