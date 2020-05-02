@@ -114,17 +114,6 @@ public class Event implements Comparable, Serializable {
         return detailsString.toString();
     }
 
-    // for debugging purposes
-    public String allFields() {
-        return new String(
-            this.name + "\n" +
-            this.startDateTime + "\n" + 
-            this.endDateTime + "\n" +
-            this.tags + "\n" +
-            this.details + "\n" +
-            this.id);
-    }
-
     @Override
     public int compareTo(Object o) {
         Event otherEvent = (Event) o;
