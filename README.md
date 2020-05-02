@@ -6,6 +6,7 @@ For more information, please refer to the [Project Pitch](https://docs.google.co
 
 ## Getting Started
 
+- Please Note: JavaFX is not included on all JavaJDK releases; this program is only compatible with Java versions 8 - 10 
 - Clone or download this Git repository to your local machine
     - ```git clone https://github.com/wustlcse237sp20/project-personal-planner-plus.git```
 - Open command line, and navigate to the repository

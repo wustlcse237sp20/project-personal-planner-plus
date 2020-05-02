@@ -75,11 +75,19 @@ public class PlannerGUI extends Application
                         calendarListView);
             }
         });
-        calendarListView.setOnMouseClicked(EventObject ->
-            calendarItemDetailClick(
-                ((IndexedCell) (EventObject.getTarget())).getIndex(),
-                calendarItemDetails,
-                calendarListView));
+        calendarListView.setOnMouseClicked(EventObject -> {
+            if(events.size() > 0){
+				try{
+				calendarItemDetailClick(
+					((IndexedCell) (EventObject.getTarget())).getIndex(),
+					calendarItemDetails,
+					calendarListView);
+				}
+				catch(Exception e){
+					System.out.println("Non-item clicked");
+				}	
+			}
+		});
 
         // Create search tool and listener
         TextField searchBar = new TextField();
@@ -108,7 +116,9 @@ public class PlannerGUI extends Application
         editItemBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                showEditEvent(calendarListView);
+				if(events.size() > 0){	
+					showEditEvent(calendarListView);
+				}
             }
         });
 
@@ -158,7 +168,7 @@ public class PlannerGUI extends Application
         });
 
         // Display the layout
-        showLayout(primaryStage, scene); 
+        showLayout(primaryStage, scene, "Personal Planner +"); 
     }
 
     public void loadEvents(){
@@ -191,8 +201,8 @@ public class PlannerGUI extends Application
         return calendarScrollPane;
     }
 
-    private void showLayout(Stage primaryStage, Scene scene){
-        primaryStage.setTitle("Personal Planner +");
+    private void showLayout(Stage primaryStage, Scene scene, String title){
+        primaryStage.setTitle(title);
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
@@ -227,23 +237,19 @@ public class PlannerGUI extends Application
 
     private void searchCalendar(String query, ListView calendarListView) {
         // Reset calendarListView
-        calendarListView.getItems().clear();
-        for (Event event : events) {
-            calendarListView.getItems().add(event.toString());
-        }
+        reloadEvents("all");
 
         // Execute search
         int index = 0;
         for (Event event : events) {
             if (!event.toString().contains(query)) {
-                System.out.println("Removal at: " + index);
                 calendarListView.getItems().remove(index);
             }
             index++;
         }
     }
 
-    // Adapted from:
+    // showAddEvent() and showEditEvent() adapted from:
     // quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
     private void showAddEvent(ListView calendarListView) {
  
@@ -437,8 +443,6 @@ public class PlannerGUI extends Application
         stage.show();
     }
 
-    // Adapted from:
-    // quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
     private void showEditEvent(ListView calendarListView) {
     	final int currIndex = calendarListView.getSelectionModel().selectedIndexProperty().getValue();
         Event eventToEdit = null;
