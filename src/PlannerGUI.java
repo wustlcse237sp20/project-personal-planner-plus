@@ -58,10 +58,27 @@ public class PlannerGUI extends Application
     {
         loadEvents();
 
-        calendarItemDetails = new Label(baseDetailMode + "OFF");
+        initializeGuiInstanceVars();
 
+        Scene scene = createSceneAndUIElements();
+
+        showLayout(primaryStage, scene); 
+    }
+
+    public void loadEvents(){
+        Planner.initializeVars();
+        Planner.loadData();
+        events = Planner.getFilteredEvents("all");
+    }
+
+    public void initializeGuiInstanceVars(){
+        calendarItemDetails = new Label(baseDetailMode + "OFF");
         calendarListView = createCalendarListView();
-        ScrollPane calendarScrollPane = listViewtoScrollPane(calendarListView);
+        tagBox = createTagBox();
+    }
+
+    public Scene createSceneAndUIElements(){
+        ScrollPane calendarScrollPane = listViewtoScrollPane();
 
         createEventsListListeners();
 
@@ -71,21 +88,11 @@ public class PlannerGUI extends Application
         
         Button editItemBtn = createEditEventButton();
 
-        ComboBox tagBox = createTagBox();
-
         HBox firstRow = createTopRow(searchBar, newItemBtn, editItemBtn, tagBox);
 
         BorderPane layout = createLayout(firstRow, calendarScrollPane);
 
-        Scene scene = createSceneWithListeners(layout);
-
-        showLayout(primaryStage, scene); 
-    }
-
-    public void loadEvents(){
-        Planner.initializeVars();
-        Planner.loadData();
-        events = Planner.getFilteredEvents("all");
+        return createSceneWithListeners(layout);
     }
 
     public void reloadEvents(String filter){
@@ -102,7 +109,7 @@ public class PlannerGUI extends Application
         return calendarListView;
     }
 
-    private ScrollPane listViewtoScrollPane(ListView calendarListView){
+    private ScrollPane listViewtoScrollPane(){
         ScrollPane calendarScrollPane = new ScrollPane();
         calendarScrollPane.setContent(calendarListView);
         calendarScrollPane.fitToWidthProperty().set(true);
@@ -281,25 +288,13 @@ public class PlannerGUI extends Application
         TextField nameField = new TextField();
         nameField.setPromptText("enter event name");
 
-        DatePicker startDatePicker = new DatePicker();
-        startDatePicker.setPromptText("enter start date and time");
-        startDatePicker.setOnAction(new EventHandler() {
-        	@Override
-        	public void handle(javafx.event.Event event) {
-			
-        		}
-        });
+        DatePicker startDatePicker = createDatePicker("enter start date");
         
         TextField startTimeField = new TextField();
         startTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
 
-        DatePicker endDatePicker = new DatePicker();
-        endDatePicker.setPromptText("enter end date and time");
-        endDatePicker.setOnAction(new EventHandler() {
-        	@Override
-        		public void handle(javafx.event.Event event) {
-        		}
-        });
+        DatePicker endDatePicker = createDatePicker("enter end date");
+        
         TextField endTimeField = new TextField();
         endTimeField.setPromptText("enter end time (\"hh:mm\", 24-hour clock)");
 
@@ -680,6 +675,18 @@ public class PlannerGUI extends Application
     		stage.setScene(scene);
     		stage.show();
     	}
+    }
+
+    createDatePicker(String message){
+        DatePicker datePicker = new DatePicker();
+        datePicker.setPromptText(message);
+        datePicker.setOnAction(new EventHandler() {
+            @Override
+            public void handle(javafx.event.Event event) {
+            
+                }
+        });
+        return datePicker;
     }
     
     @Override
