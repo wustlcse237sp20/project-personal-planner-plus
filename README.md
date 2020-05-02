@@ -24,6 +24,10 @@ For more information, please refer to the [Project Pitch](https://docs.google.co
 - Search Events by title
 - Create event tags and filter events by tag
 
+## Is there anything that you implemented but doesn't currently work?
+
+N/A
+
 ## Resources
 
 [JavaFX](https://docs.oracle.com/javase/8/javase-clienttechnologies.htm)

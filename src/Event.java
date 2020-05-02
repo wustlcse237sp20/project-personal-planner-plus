@@ -73,16 +73,13 @@ public class Event implements Comparable, Serializable {
     public String formatDate(LocalDateTime dateTime){
         int currentYear = LocalDateTime.now().getYear();
         DateTimeFormatter formatter;
-        if(dateTime.getYear()/1000 != currentYear/1000) // not in current millenium
-        {
+        if(dateTime.getYear()/1000 != currentYear/1000){ // not in current millenium
             formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         }
-        else if(dateTime.getYear() != currentYear) // not in current yr, but in same millenium
-        {
+        else if(dateTime.getYear() != currentYear) { // not in current yr, but in same millenium
             formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
         }
-        else // in current yr
-        {
+        else { // in current yr
             formatter = DateTimeFormatter.ofPattern("MM/dd");
         }
         return dateTime.format(formatter);
@@ -105,12 +102,12 @@ public class Event implements Comparable, Serializable {
              detailsString.append(startDateString + "\t" + formatTime(startDateTime) + " - " + formatTime(endDateTime) + "\n" + "Tags:\t");
         }
         else{
-            detailsString.append(startDateString +" "+ formatTime(startDateTime) + " - "+endDateString +" "+ formatTime(endDateTime) + "\n" + "Tags:\t");
+            detailsString.append(startDateString + " " + formatTime(startDateTime) + " - " + endDateString + " " + formatTime(endDateTime) + "\n" + "Tags:\t");
         }
         for (String tag : tags){
             detailsString.append(tag + ", ");
         }
-        detailsString.append("\n"+details);
+        detailsString.append("\n" + details);
         return detailsString.toString();
     }
 
