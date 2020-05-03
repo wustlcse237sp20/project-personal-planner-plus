@@ -100,7 +100,7 @@ public class PlannerGUI extends Application
 
     private ListView createCalendarListView() {
         ListView calendarListView = new ListView();
-        for (Event event:events) {
+        for (Event event : events) {
             calendarListView.getItems().add(event.toString());           
         }
         return calendarListView;
@@ -221,7 +221,8 @@ public class PlannerGUI extends Application
                         int currIndex = calendarListView.getSelectionModel().selectedIndexProperty().getValue();
                         if(currIndex > -1) {
                             calendarListView.getItems().remove(currIndex);
-                            events.remove(currIndex);
+                            Planner.deleteEvent(currIndex);
+                            updateTagBox();
                             calendarItemDetails.setText(baseDetailMode +  "OFF");
                         }
                         break;
@@ -287,6 +288,17 @@ public class PlannerGUI extends Application
         }
     }
 
+    
+    private void updateTagBox() {
+        tagBox.getItems().clear();
+        tagBox.getItems().add("all");
+        for (String tag : Planner.getTagSet()) {
+            tagBox.getItems().add(tag);
+        }
+        tagBox.setValue("all");
+
+    }
+    
     // showAddEvent() and showEditEvent() adapted from:
     // quickprogrammingtips.com/java/how-to-open-a-new-window-in-javafx.html
     private void showAddEvent(ListView calendarListView) {
@@ -294,13 +306,13 @@ public class PlannerGUI extends Application
         TextField nameField = new TextField();
         nameField.setPromptText("enter event name");
 
-        DatePicker startDatePicker = createDatePicker("enter start date");
-        
+        Label startTimeLabel = new Label("Enter start date and time:");
+        DatePicker startDatePicker = new DatePicker(LocalDate.now());
         TextField startTimeField = new TextField();
         startTimeField.setPromptText("enter start time (\"hh:mm\", 24-hour clock)");
 
-        DatePicker endDatePicker = createDatePicker("enter end date");
-
+        Label endTimeLabel = new Label("Enter end date and time:");
+        DatePicker endDatePicker = new DatePicker(LocalDate.now());
         TextField endTimeField = new TextField();
         endTimeField.setPromptText("enter end time (\"hh:mm\", 24-hour clock)");
 
@@ -406,13 +418,13 @@ public class PlannerGUI extends Application
 	            else {
 	            	nameField.setStyle("-fx-background-color: white");
 	            }
-	            for(int i = 0; i < tags.size(); i++) {
+	            for (int i = 0; i < tags.size(); i++) {
                     String tag = tags.get(i);
                     if(tag.length() > 0 && !tag.equals("all")) {
                         validTags.add(tag);
                     }
                 }
-	            for(int i = 0; i < validTags.size(); i++) {
+	            for (int i = 0; i < validTags.size(); i++) {
 	            	String tag = validTags.get(i);
 	            	if(tag.charAt(0) == ' ') {
                 		tag = tag.substring(1);
@@ -438,12 +450,8 @@ public class PlannerGUI extends Application
 	            	
 	            	resetCalendarListView();
 
-                    tagBox.getItems().clear();
-                    tagBox.getItems().add("all");
-                    for (String tag : Planner.getTagSet()) {
-                        tagBox.getItems().add(tag);
-                    }
-                    tagBox.setValue("all");
+	            	updateTagBox();
+	            	
 	            	stage.close(); // return to main window
                     calendarItemDetails.setText(baseDetailMode +  "OFF");        	
 	            }
@@ -454,13 +462,17 @@ public class PlannerGUI extends Application
         });
         VBox box = new VBox();
         Label label = new Label("New event:");
+		Label spacingLabel = new Label(" ");
         box.getChildren().addAll(
             label, 
             nameField, 
+            startTimeLabel,
             startDatePicker, 
             startTimeField,
+            endTimeLabel,
             endDatePicker, 
             endTimeField, 
+            spacingLabel,
             textTags, 
             detailText,
             errLabel,
@@ -483,24 +495,13 @@ public class PlannerGUI extends Application
     		
     		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-    		DatePicker startDatePicker = new DatePicker(eventToEdit.getStartDateTime().toLocalDate());
-    		startDatePicker.setOnAction(new EventHandler() {
-    			@Override
-    			public void handle(javafx.event.Event event) {
-    				
-    			}
-    		});	
-
+    		Label startTimeLabel = new Label("Edit start time:");
+            DatePicker startDatePicker = new DatePicker(eventToEdit.getStartDateTime().toLocalDate());
     		TextField startTimeField = new TextField();
     		startTimeField.setText(eventToEdit.getStartDateTime().format(timeFormatter));
     		
-    		DatePicker endDatePicker = new DatePicker(eventToEdit.getEndDateTime().toLocalDate());
-    		endDatePicker.setOnAction(new EventHandler() {
-    			@Override
-    			public void handle(javafx.event.Event event) {
-    			}
-    		});
-    		
+    		Label endTimeLabel = new Label("Edit end time:");
+            DatePicker endDatePicker = new DatePicker(eventToEdit.getEndDateTime().toLocalDate());
     		TextField endTimeField = new TextField();
     		endTimeField.setText(eventToEdit.getEndDateTime().format(timeFormatter));
     		
@@ -508,7 +509,7 @@ public class PlannerGUI extends Application
     		StringBuilder sb = new StringBuilder();
     		List<String> eventTags = eventToEdit.getTags();
     		if(eventTags.size() > 0) {
-    			for(int i = 0; i < eventTags.size() - 1; i++) {
+    			for (int i = 0; i < eventTags.size() - 1; i++) {
     				sb.append(eventTags.get(i));
     				sb.append(", ");
     			}
@@ -623,13 +624,13 @@ public class PlannerGUI extends Application
     				else {
     					nameField.setStyle("-fx-background-color: white");
     				}
-    				for(int i = 0; i < tags.size(); i++) {
+    				for (int i = 0; i < tags.size(); i++) {
     					String tag = tags.get(i);
     					if(tag.length() > 0 && !tag.equals("all")) {
     						validTags.add(tag);
     					}
     				}
-    				for(int i = 0; i < validTags.size(); i++) {
+    				for (int i = 0; i < validTags.size(); i++) {
     					String tag = validTags.get(i);
     					if(tag.charAt(0) == ' ') {
     						tag = tag.substring(1);
@@ -655,13 +656,8 @@ public class PlannerGUI extends Application
     					Planner.editEvent(currIndex, replacementEvent);
     					
     					resetCalendarListView();
+    					updateTagBox();
     					
-    					tagBox.getItems().clear();
-    					tagBox.getItems().add("all");
-    					for (String tag : Planner.getTagSet()) {
-    						tagBox.getItems().add(tag);
-    					}
-    					tagBox.setValue("all");
     					stage.close(); // return to main window	   
                         calendarItemDetails.setText(baseDetailMode +  "OFF");         	
     				}
@@ -669,13 +665,17 @@ public class PlannerGUI extends Application
     		});
     		VBox box = new VBox();
     		Label label = new Label("New event:");
+    		Label spacingLabel = new Label(" ");
     		box.getChildren().addAll(
     				label, 
     				nameField, 
+    				startTimeLabel,
     				startDatePicker, 
     				startTimeField,
+    				endTimeLabel,
     				endDatePicker, 
     				endTimeField, 
+    				spacingLabel,
     				textTags, 
     				detailText,
     				errLabel,
@@ -686,18 +686,6 @@ public class PlannerGUI extends Application
     	}
     }
 
-    DatePicker createDatePicker(String message) {
-        DatePicker datePicker = new DatePicker();
-        datePicker.setPromptText(message);
-        datePicker.setOnAction(new EventHandler() {
-            @Override
-            public void handle(javafx.event.Event event) {
-            
-                }
-        });
-        return datePicker;
-    }
-    
     @Override
     public void stop() {
         Planner.setEvents(events);

@@ -6,13 +6,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import src.Planner;
 import src.Event;
 
 public class PlannerTest 
-{
+{	
 	@Test
 	public void testAddEvent(){
 		Planner.initializeVars();
@@ -56,8 +57,6 @@ public class PlannerTest
 		Planner.setEvents(new ArrayList<Event>());
 		Planner.loadData();
 		
-		assertTrue("Data was not loaded properly", eventsList.equals(Planner.getEvents()));			
-
-		
+		assertTrue("Data was not loaded properly", eventsList.equals(Planner.getEvents()));					
 	}
 }

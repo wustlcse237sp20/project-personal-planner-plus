@@ -27,7 +27,7 @@ public class Planner
     	nextId = 0;
     }
 
-    // Note: writeDatat() and loadData() adapted from:
+    // Note: writeData() and loadData() adapted from:
     // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
 
     public static void writeData() {
@@ -116,8 +116,50 @@ public class Planner
         return filtered;
     }
 
+    private static void removeUnusedTags(int index, Event replacementEvent) {
+    	Event originalEvent = events.get(index);
+    	
+    	Set<String> lostTags = new HashSet<String>();
+    	Set<String> allOtherTags = new HashSet<String>();
+
+    	for (int i = 0; i < events.size(); i++) {
+    		if(i != index) {
+    			Event event = events.get(i);
+    			for(String tag : event.getTags()) {
+    				allOtherTags.add(tag);
+    			}
+    		}
+    	}
+    	    	
+    	if(replacementEvent == null) {
+    		lostTags.addAll(originalEvent.getTags());
+    	}
+    	else {
+	    	for (String tag : originalEvent.getTags()) {
+	    		if(!replacementEvent.getTags().contains(tag)) {
+	    			lostTags.add(tag);
+	    		}
+	    	}	    	
+    	}
+
+    	for (String lostTag : lostTags) {
+    		if(!allOtherTags.contains(lostTag)) {
+    			tagSet.remove(lostTag);
+    		}
+    	}
+    }
+    
     public static void editEvent(int index, Event replacementEvent) {
+    	for(String tag : replacementEvent.getTags()) {
+    		tagSet.add(tag);
+    	}
+    	removeUnusedTags(index, replacementEvent);
     	events.set(index, replacementEvent);
+    }
+    
+    public static void deleteEvent(int index) {
+    	removeUnusedTags(index, null);
+    	events.remove(index);
     }
     
     public static void setEvents(List<Event> newEvents) {
