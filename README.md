@@ -21,6 +21,7 @@ For more information, please refer to the [Project Pitch](https://docs.google.co
     - Times must be entered in a "HH:mm" format, with a 24 hour clock
     - Events need to have a name, start date/time, and end date/time; the tags are comma-separated, and the tags and description are both optional
     - The bar that is selected when the program opens is the search bar; it must be clear to ensure all events are being displayed
+    - There will be a lengthy exception message in the commandline when you run the program; it does not interfere with the functionality.
 
 ## What user stories were completed this iteration?
 - Search Events by title
