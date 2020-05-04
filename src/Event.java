@@ -70,25 +70,22 @@ public class Event implements Comparable, Serializable {
         this.details = details;
     }
 
-    public String formatDate(LocalDateTime dateTime){
+    private static String formatDate(LocalDateTime dateTime){
         int currentYear = LocalDateTime.now().getYear();
         DateTimeFormatter formatter;
-        if(dateTime.getYear()/1000 != currentYear/1000) // not in current millenium
-        {
+        if(dateTime.getYear()/1000 != currentYear/1000){ // not in current millennium
             formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         }
-        else if(dateTime.getYear() != currentYear) // not in current yr, but in same millenium
-        {
+        else if(dateTime.getYear() != currentYear) { // not in current year, but in same millennium
             formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
         }
-        else // in current yr
-        {
+        else { // in current year
             formatter = DateTimeFormatter.ofPattern("MM/dd");
         }
         return dateTime.format(formatter);
     }
 
-    public String formatTime(LocalDateTime dateTime){
+    private static String formatTime(LocalDateTime dateTime){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         return dateTime.format(formatter);
     }
@@ -105,12 +102,13 @@ public class Event implements Comparable, Serializable {
              detailsString.append(startDateString + "\t" + formatTime(startDateTime) + " - " + formatTime(endDateTime) + "\n" + "Tags:\t");
         }
         else{
-            detailsString.append(startDateString +" "+ formatTime(startDateTime) + " - "+endDateString +" "+ formatTime(endDateTime) + "\n" + "Tags:\t");
+            detailsString.append(startDateString + " " + formatTime(startDateTime) + " - " + endDateString + " " + formatTime(endDateTime) + "\n" + "Tags:\t");
         }
-        for (String tag : tags){
-            detailsString.append(tag + ", ");
+        for (int i = 0; i < tags.size() - 1; i++) {
+        	detailsString.append(tags.get(i) + ", ");
         }
-        detailsString.append("\n"+details);
+        detailsString.append(tags.get(tags.size() - 1));
+        detailsString.append("\n" + details);
         return detailsString.toString();
     }
 
@@ -135,25 +133,6 @@ public class Event implements Comparable, Serializable {
             otherEvent = (Event) o;
         } else {
             return false;
-        }
-
-        if (!this.name.equals(otherEvent.name)) {
-            System.out.println("this.name (" + this.name + ") != otherEvent.name (" + otherEvent.name + ")");
-        }
-        if (!this.startDateTime.equals(otherEvent.startDateTime)) {
-            System.out.println("this.startDate (" + this.startDateTime + ") != otherEvent.startDate (" + otherEvent.startDateTime + ")");
-        }
-        if (!this.endDateTime.equals(otherEvent.endDateTime)) {
-            System.out.println("this.endDate (" + this.endDateTime + ") != otherEvent.endDate (" + otherEvent.endDateTime + ")");
-        }
-        if (!this.tags.equals(otherEvent.tags)) {
-            System.out.println("this.tags (" + this.tags + ") != otherEvent.tags (" + otherEvent.tags + ")");
-        }
-        if (!this.details.equals(otherEvent.details)) {
-            System.out.println("this.details (" + this.details + ") != otherEvent.details (" + otherEvent.details + ")");
-        }
-        if (this.id != otherEvent.id) {
-            System.out.println("this.id (" + this.id + ") != otherEvent.startDate (" + otherEvent.id + ")");
         }
 
         return this.name.equals(otherEvent.name) &&
