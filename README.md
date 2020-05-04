@@ -18,11 +18,14 @@ For more information, please refer to the [Project Pitch](https://docs.google.co
     - Note: On Mac, you may receive an error message from System Preferences, which can be disregarded
 - The app will then launch. Note that:
     - Events are deleted by selecting and pressing backspace
+    - Times must be entered in a "HH:mm" format, with a 24 hour clock
+    - Events need to have a name, start date/time, and end date/time; the tags are comma-separated, and the tags and description are both optional
 
 ## What user stories were completed this iteration?
 
 - Search Events by title
 - Create event tags and filter events by tag
+
 
 ## Is there anything that you implemented but doesn't currently work?
 
