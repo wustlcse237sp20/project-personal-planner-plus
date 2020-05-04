@@ -22,14 +22,15 @@ For more information, please refer to the [Project Pitch](https://docs.google.co
     - Events need to have a name, start date/time, and end date/time; the tags are comma-separated, and the tags and description are both optional
 
 ## What user stories were completed this iteration?
-
 - Search Events by title
+- Ability to edit events
 - Create event tags and filter events by tag
 
 
 ## Is there anything that you implemented but doesn't currently work?
 
 N/A
+
 
 ## Resources
 
