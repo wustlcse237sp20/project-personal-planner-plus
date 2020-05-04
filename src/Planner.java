@@ -19,7 +19,7 @@ public class Planner
     static List<Event> events;
     static Set<String> tagSet;
     static Integer nextId;
-    static final String DATA_FILE_NAME = "./bin/data.txt";
+    static final String DATA_FILE_NAME = "./data.txt";
 
     public static void initializeVars() {
     	events = new ArrayList<Event>();
